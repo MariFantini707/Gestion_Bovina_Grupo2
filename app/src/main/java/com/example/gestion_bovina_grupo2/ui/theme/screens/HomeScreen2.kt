@@ -7,7 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeMenuPrincipal
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeScreenCompacta
-import com.example.gestion_bovina_grupo2.ui.theme.utils.observeWindowSizeClass
+import observeWindowSizeClass
 
 
 @Composable

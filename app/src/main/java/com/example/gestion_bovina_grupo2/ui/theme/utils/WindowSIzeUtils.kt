@@ -6,6 +6,6 @@ import androidx.compose.runtime.Composable
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun obtenerWindowSizeClass(): WindowSizeClass {
+fun observeWindowSizeClass(): WindowSizeClass {
     return calculateWindowSizeClass(LocalActivity.current as android.app.Activity)
 }
