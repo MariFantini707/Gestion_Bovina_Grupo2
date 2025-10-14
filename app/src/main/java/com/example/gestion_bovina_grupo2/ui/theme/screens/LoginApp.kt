@@ -19,6 +19,52 @@ import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginIngreso(){
+fun IngresoLogin(){
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(text = "Este sería al menú principal") })
+        }
+    ) { innerPadding ->
+        Image(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Logo App",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height = 300.dp),
+            contentScale = ContentScale.Fit
+        )
+        Column(
+            modifier = Modifier
+                .padding(paddingValues = innerPadding)
+                .fillMaxSize()
+                .padding(all = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(space = 20.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo App",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height = 300.dp),
+                contentScale = ContentScale.Fit
+            )
+            Text(
+                text = "¡Bienvenido!",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleLarge
+            )
 
+            Button(onClick = { /* acción futura */ }) {
+                Text(text = "Agregar ramito")
+            }
+
+
+        }
+    }
+}
+
+@Preview(name="LoginApp", widthDp = 360, heightDp = 800)
+@Composable
+fun LoginApp(){
+    IngresoLogin()
 }
