@@ -19,7 +19,7 @@ import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IngresoLogin(){
+fun IngresLogin(){
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(text = "Este sería al menú principal") })
@@ -66,5 +66,5 @@ fun IngresoLogin(){
 @Preview(name="LoginApp", widthDp = 360, heightDp = 800)
 @Composable
 fun LoginApp(){
-    IngresoLogin()
+    IngresLogin()
 }
