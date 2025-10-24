@@ -34,12 +34,12 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding) // Para asegurarte de que el padding se respete
+                .padding(innerPadding)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp), // Padding dentro de la columna
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(space = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
