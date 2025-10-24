@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gestion_bovina_grupo2.ui.theme.screens.ResumenScreen
 import com.example.gestion_bovina_grupo2.ViewModel.UsuarioViewModel
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen
-import com.example.gestion_bovina_grupo2.ui.theme.screens.RegistroScreen
+
 
 @Composable
 fun AppNavigation(){

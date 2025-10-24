@@ -14,23 +14,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.gestion_bovina_grupo2.R
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.Alignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(){
     Scaffold(
-        topBar = {
+        /*topBar = {
             TopAppBar(title = { Text("Mi App DUOC UC") })
-        }
+        }*/
     ){ innerPadding ->
         Column (
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Alignment.CenterVertically as Arrangement.Vertical
         ){
-            Text(text="Bienvenido")
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(text="Gestión bovina")
             Button(onClick = {/*ACCION FUTURA*/}
             ) {
                 Text("Presioname")
@@ -43,10 +45,7 @@ fun HomeScreen(){
                     .height(150.dp),
                 contentScale = ContentScale.Fit
             )
-            Button(onClick = {/*ACCION FUTURA*/}
-            ) {
-                Text("Presioname")
-            }
+
         }
     }
 }
