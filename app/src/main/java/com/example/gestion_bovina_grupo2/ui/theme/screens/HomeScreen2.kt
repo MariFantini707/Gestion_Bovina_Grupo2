@@ -25,8 +25,18 @@ fun PreviewCompact(){
     HomeScreenCompacta()
 }
 
+@Composable
+fun HomeScreenCompacta() {
+    TODO("Not yet implemented")
+}
+
 @Preview(name="MenuPrincipal", widthDp = 360, heightDp = 800)
 @Composable
 fun HomeMenuCompact(){
+    HomeMenuPrincipal()
+}
+@Preview(name="MenuPrincipal", widthDp = 360, heightDp = 800)
+@Composable
+fun HomeMenuPrincipal() {
     HomeMenuPrincipal()
 }
