@@ -19,7 +19,7 @@ import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenCompacta() {
+fun HomeScreenCompactaa() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(text = "Mi App Kotlin") })
@@ -56,5 +56,5 @@ fun HomeScreenCompacta() {
 @Preview(name="Compact", widthDp = 360, heightDp = 800)
 @Composable
 fun HomePreviewCompact(){
-    HomeScreenCompacta()
+    HomeScreenCompactaa()
 }

@@ -20,7 +20,7 @@ import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeMenuPrincipal() {
+fun HomeMenuPrincipall() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(text = "Este sería al menú principal") })
@@ -39,10 +39,6 @@ fun HomeMenuPrincipal() {
                 style = MaterialTheme.typography.titleLarge
             )
 
-            Button(onClick = { /* acción futura */ }) {
-                Text(text = "Agregar ramito")
-            }
-
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo App",
@@ -51,11 +47,14 @@ fun HomeMenuPrincipal() {
                     .height(height = 300.dp),
                 contentScale = ContentScale.Fit
             )
+            Button(onClick = { /* acción futura */ }) {
+                Text(text = "Agregar ramito")
+            }
         }
     }
 }
 @Preview(name="MenuPrincipal", widthDp = 360, heightDp = 800)
 @Composable
 fun MenuPrincipal(){
-    HomeMenuPrincipal()
+    HomeMenuPrincipall()
 }

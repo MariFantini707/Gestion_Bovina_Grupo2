@@ -1,5 +1,6 @@
 package com.example.gestion_bovina_grupo2.ViewModel
 
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.example.gestion_bovina_grupo2.model.Usuario

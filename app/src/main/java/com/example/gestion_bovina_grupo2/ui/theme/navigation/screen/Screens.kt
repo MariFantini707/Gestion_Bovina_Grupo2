@@ -1,9 +1,9 @@
 package com.example.gestion_bovina_grupo2.ui.theme.navigation.screen
 
 sealed class Screens(val route: String) {
-    data object Home : Screens("home_page")
+    data object HomeScreen : Screens("home_screen")
 
-    data object Profile : Screens("profile_page")
+    data object LoginScreen : Screens("login_screen")
 
     data object Settings : Screens("settings_page")
 

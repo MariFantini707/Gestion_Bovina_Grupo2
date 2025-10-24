@@ -11,3 +11,8 @@ data class Usuario(
     val isValid: Boolean = false,
     val errores: UsuarioErrores = UsuarioErrores()
 )
+
+data class UsuarioErrores(
+    val email: String? = null,
+    val password: String? = null
+)

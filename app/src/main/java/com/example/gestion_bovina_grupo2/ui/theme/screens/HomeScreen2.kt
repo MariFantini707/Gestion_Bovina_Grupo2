@@ -14,7 +14,7 @@ import observeWindowSizeClass
 fun HomeScreen2(){
     val windowSizeClass = observeWindowSizeClass()
     when (windowSizeClass.widthSizeClass){
-        WindowWidthSizeClass.Compact -> HomeScreenCompacta()
+        WindowWidthSizeClass.Compact -> HomeScreenCompactaa()
     }
 }
 
@@ -22,7 +22,7 @@ fun HomeScreen2(){
 @Preview(name="Compact", widthDp = 360, heightDp = 800)
 @Composable
 fun PreviewCompact(){
-    HomeScreenCompacta()
+    HomeScreenCompactaa()
 }
 
 @Composable
@@ -33,10 +33,6 @@ fun HomeScreenCompacta() {
 @Preview(name="MenuPrincipal", widthDp = 360, heightDp = 800)
 @Composable
 fun HomeMenuCompact(){
-    HomeMenuPrincipal()
+    HomeMenuPrincipall()
 }
-@Preview(name="MenuPrincipal", widthDp = 360, heightDp = 800)
-@Composable
-fun HomeMenuPrincipal() {
-    HomeMenuPrincipal()
-}
+

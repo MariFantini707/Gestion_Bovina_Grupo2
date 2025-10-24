@@ -1,4 +1,4 @@
-package com.example.gestion_bovina_grupo2.ui.theme.utils
+package com.example.gestion_bovina_grupo2.ui.theme.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.gestion_bovina_grupo2.R
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
-import androidx.compose.ui.graphics.painter.Painter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +43,10 @@ fun HomeScreen(){
                     .height(150.dp),
                 contentScale = ContentScale.Fit
             )
+            Button(onClick = {/*ACCION FUTURA*/}
+            ) {
+                Text("Presioname")
+            }
         }
     }
 }
