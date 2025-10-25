@@ -65,7 +65,9 @@ fun LoginScreen(
 
                 OutlinedTextField(
                     value = estado.email,
-                    onValueChange = viewModel::onEmailChange,
+                    onValueChange = { nuevoValor ->
+                        viewModel.onEmailChange(nuevoValor.trim())
+                    },
                     label = { Text("Correo electrónico")},
                     isError = estado.errores.email != null,
                     supportingText = {
@@ -95,10 +97,18 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         if (viewModel.validarLogin()){
-                            navController.navigate("registro")
+                            navController.navigate("inicio"){
+                                popUpTo("login") { inclusive = true }
+                            }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1DB954),  // Verde Spotify
+                        contentColor = Color.White            // Texto blanco
+                    )
                 ) {
                     Text("Iniciar sesión")
                 }
