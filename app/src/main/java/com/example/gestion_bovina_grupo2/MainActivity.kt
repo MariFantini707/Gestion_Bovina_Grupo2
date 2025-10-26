@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.gestion_bovina_grupo2.ui.theme.Gestion_Bovina_Grupo2Theme
+
 import com.example.gestion_bovina_grupo2.ui.theme.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
@@ -31,3 +31,9 @@ fun AppPreview() {
         AppNavigation()
     }
 }
+
+@Composable
+fun Gestion_Bovina_Grupo2Theme(content: @Composable () -> Unit) {
+    TODO("Not yet implemented")
+}
+

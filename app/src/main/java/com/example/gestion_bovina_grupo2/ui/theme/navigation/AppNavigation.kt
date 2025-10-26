@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +14,7 @@ import com.example.gestion_bovina_grupo2.ui.theme.screens.CrearVacaScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.ReportesScreen
+
 
 @Composable
 fun AppNavigation() {
@@ -65,4 +67,29 @@ fun AppNavigation() {
             }
         }
     }
+}
+
+@Composable
+fun ReportesScreen(navController: NavHostController) {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun CrearVacaScreen(navController: NavHostController) {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun HomeScreen(navController: NavHostController) {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun BottomNavBar(navController: NavHostController) {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun LoginScreen(navController: NavHostController) {
+    TODO("Not yet implemented")
 }

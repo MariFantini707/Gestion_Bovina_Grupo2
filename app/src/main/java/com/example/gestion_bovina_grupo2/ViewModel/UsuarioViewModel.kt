@@ -7,6 +7,7 @@ import com.example.gestion_bovina_grupo2.model.Usuario
 import com.example.gestion_bovina_grupo2.model.UsuarioErrores
 import kotlinx.coroutines.flow.update
 
+
 private const val EMAIL_VALIDO = "admin@mail.com"
 private const val PASSWORD_VALIDA = "123456"
 

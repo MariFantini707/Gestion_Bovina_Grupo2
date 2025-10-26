@@ -17,3 +17,5 @@ data class UsuarioErrores(
     val password: String? = null,
     val loginGeneral: String? = null
 )
+
+

@@ -58,3 +58,4 @@ fun HomeScreenCompactaa() {
 fun HomePreviewCompact(){
     HomeScreenCompactaa()
 }
+
