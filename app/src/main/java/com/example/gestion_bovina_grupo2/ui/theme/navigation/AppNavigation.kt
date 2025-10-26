@@ -73,27 +73,3 @@ fun AppNavigation() {
     }
 }
 
-@Composable
-fun ReportesScreen(navController: NavHostController) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun CrearVacaScreen(navController: NavHostController) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun HomeScreen(navController: NavHostController) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun BottomNavBar(navController: NavHostController) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun LoginScreen(navController: NavHostController) {
-    TODO("Not yet implemented")
-}

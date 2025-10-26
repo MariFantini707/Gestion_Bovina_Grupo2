@@ -22,7 +22,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gestion_bovina_grupo2.R
 import com.example.gestion_bovina_grupo2.ViewModel.UsuarioViewModel
 import com.example.gestion_bovina_grupo2.ui.theme.GreenColor
-import com.example.gestion_bovina_grupo2.ui.theme.navigation.LoginScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
