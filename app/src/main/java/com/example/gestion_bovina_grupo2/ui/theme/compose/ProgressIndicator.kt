@@ -13,8 +13,8 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.navigation.compose.rememberNavController
-
-
+import androidx.compose.ui.graphics.Color
+val GreenColor = Color(0xFF237834)
 @Composable
 fun SplashScreen(navController: NavController) {
     var currentProgress by remember { mutableStateOf(0f) }
@@ -48,11 +48,12 @@ fun SplashScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize().padding(32.dp)
             ) {
-                Text(text = "Cargando...", style = MaterialTheme.typography.titleMedium)
+                Text(text = "Iniciando la aplicación", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(24.dp))
                 LinearProgressIndicator(
                     progress = currentProgress,
-                    modifier = Modifier.fillMaxWidth().height(8.dp)
+                    modifier = Modifier.fillMaxWidth().height(8.dp),
+                    color = GreenColor
                 )
             }
         }
@@ -63,7 +64,7 @@ fun SplashScreen(navController: NavController) {
 suspend fun loadProgress(updateProgress: (Float) -> Unit) {
     for (i in 1..100) {
         updateProgress(i.toFloat() / 100)
-        delay(30) // Controla la velocidad del progreso
+        delay(25) // Controla la velocidad del progreso
     }
 }
 
