@@ -9,24 +9,32 @@ import kotlinx.coroutines.flow.update
 
 class VacaViewModel : ViewModel() {
 
-    private val _estado = MutableStateFlow(Vaca(
-        diio = TODO(),
-        fecha = TODO(),
-        genero = TODO(),
-        raza = TODO(),
-        ubicacion = TODO(),
-        enfermedades = TODO(),
-        fotoVaca = TODO(),
-        erroresVaca = TODO()
-    ))
+    private val _estado = MutableStateFlow(Vaca())
     val estado: StateFlow<Vaca> = _estado
 
-    // Cambiar valores de los campos
-    fun onCodigoChange(valor: Int) {
+    fun onDiioChange(valor: String) {
         _estado.update {
             it.copy(
                 diio = valor,
                 erroresVaca = it.erroresVaca.copy(diio = null)
+            )
+        }
+    }
+
+    fun onFechaChange(valor: String) {
+        _estado.update {
+            it.copy(
+                fecha = valor,
+                erroresVaca = it.erroresVaca.copy(fecha = null)
+            )
+        }
+    }
+
+    fun onGeneroChange(valor: String) {
+        _estado.update {
+            it.copy(
+                genero = valor,
+                erroresVaca = it.erroresVaca.copy(genero = null)
             )
         }
     }
@@ -40,45 +48,55 @@ class VacaViewModel : ViewModel() {
         }
     }
 
-    // Validación de formulario de vaca
+    fun onUbicacionChange(valor: String) {
+        _estado.update {
+            it.copy(
+                ubicacion = valor,
+                erroresVaca = it.erroresVaca.copy(ubicacion = null)
+            )
+        }
+    }
+
+    fun onEnfermedadesChange(valor: String) {
+        if (valor.length <= 150) {
+            _estado.update {
+                it.copy(
+                    enfermedades = valor,
+                    erroresVaca = it.erroresVaca.copy(enfermedades = null)
+                )
+            }
+        }
+    }
+
     fun validarFormulario(): Boolean {
         val estadoActual = _estado.value
 
-        // Primero valida que los campos no estén vacíos
         val erroresVaca = VacaErrores(
             diio = when {
-                estadoActual.diio == null -> "El código es obligatorio"
-                estadoActual.diio.toString().isBlank() -> "El código debe ser un número válido"
+                estadoActual.diio.trim().isEmpty() -> "Ingrese el DIIO! ⚠️"
+                !estadoActual.diio.all { it.isDigit() } -> "Ingrese solo números! ⚠️"
                 else -> null
-            } as Int?,
+            },
             fecha = when {
-                estadoActual.fecha.isBlank() -> "La fecha es obligatoria"
+                estadoActual.fecha.trim().isEmpty() -> "Ingrese una fecha! ⚠️"
                 else -> null
             },
             genero = when {
-                estadoActual.genero.isBlank() -> "El género es obligatorio"
+                estadoActual.genero.isEmpty() ||
+                        !listOf("m", "h").contains(estadoActual.genero) -> "Ingrese el género ⚠️"
                 else -> null
             },
             raza = when {
-                estadoActual.raza.isBlank() -> "La raza es obligatoria"
+                estadoActual.raza.trim().isEmpty() -> "Ingrese la raza! ⚠️"
                 else -> null
             },
             ubicacion = when {
-                estadoActual.ubicacion.isBlank() -> "La ubicación es obligatoria"
-                else -> null
-            },
-            enfermedades = when {
-                estadoActual.enfermedades.isNullOrBlank() -> null
-                else -> null
-            },
-            fotoVaca = when {
-                estadoActual.fotoVaca.isNullOrBlank() -> null
+                estadoActual.ubicacion.trim().isEmpty() -> "Ingrese una ubicación! ⚠️"
                 else -> null
             }
         )
 
-        // Si hay errores de campos vacíos, retorna false
-        val hayErroresCampos = listOfNotNull(
+        val hayErrores = listOfNotNull(
             erroresVaca.diio,
             erroresVaca.fecha,
             erroresVaca.genero,
@@ -86,16 +104,14 @@ class VacaViewModel : ViewModel() {
             erroresVaca.ubicacion
         ).isNotEmpty()
 
-        if (hayErroresCampos) {
+        if (hayErrores) {
             _estado.update { it.copy(erroresVaca = erroresVaca) }
             return false
         }
+
         return true
     }
 
-
-
-    // Limpiar formulario
     fun limpiarFormulario() {
         _estado.value = Vaca()
     }

@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.gestion_bovina_grupo2.ui.theme.screens.ResumenScreen
 import com.example.gestion_bovina_grupo2.ViewModel.UsuarioViewModel
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen
 
@@ -23,9 +22,6 @@ fun AppNavigation(){
     ){
         composable("registro"){
             LoginScreen(navController, usuarioViewModel)
-        }
-        composable("resumen"){
-            ResumenScreen(usuarioViewModel)
         }
     }
 }

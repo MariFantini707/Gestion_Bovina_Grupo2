@@ -15,36 +15,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CrearVacaScreen(navController: NavController) {
-    var codigo by remember { mutableStateOf("") }
-    var raza by remember { mutableStateOf("") }
-    var edad by remember { mutableStateOf("") }
-    var peso by remember { mutableStateOf("") }
-    var observaciones by remember { mutableStateOf("") }
-
-    // Estados de error
-    var nombreError by remember { mutableStateOf(false) }
-    var codigoError by remember { mutableStateOf(false) }
+fun CrearVacaScreen(
+    navController: NavController,
+    viewModel: VacaViewModel = viewModel()
+) {
+    val estado by viewModel.estado.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Registrar Nueva Vaca",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Registrar Nueva Vaca", fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
+                        Icon(Icons.Filled.ArrowBack, "Volver")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -69,152 +60,167 @@ fun CrearVacaScreen(navController: NavController) {
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
 
-            // Campo Código
+            Text(
+                text = "El * significa obligatorio",
+                fontSize = 14.sp,
+                color = Color(0xFFB2ACAC),
+                fontWeight = FontWeight.Bold
+            )
+
+            // DIIO
             OutlinedTextField(
-                value = codigo,
+                value = estado.diio,
                 onValueChange = {
-                    codigo = it.uppercase()
-                    codigoError = false
+                    if (it.isEmpty() || it.all { char -> char.isDigit() }) {
+                        viewModel.onDiioChange(it)
+                    }
                 },
-                label = { Text("Código de identificación *") },
-                placeholder = { Text("Ej: COD-001") },
-                isError = codigoError,
+                label = { Text("* DIIO") },
+                placeholder = { Text("Solo números") },
+                isError = estado.erroresVaca.diio != null,
                 supportingText = {
-                    if (codigoError) {
-                        Text(
-                            "El código es obligatorio",
-                            color = MaterialTheme.colorScheme.error
+                    estado.erroresVaca.diio?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+
+            // Fecha
+            OutlinedTextField(
+                value = estado.fecha,
+                onValueChange = viewModel::onFechaChange,
+                label = { Text("* Fecha de Nacimiento") },
+                placeholder = { Text("DD/MM/AAAA") },
+                isError = estado.erroresVaca.fecha != null,
+                supportingText = {
+                    estado.erroresVaca.fecha?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                trailingIcon = { Text("📅") }
+            )
+
+            // Género
+            var expanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = when(estado.genero) {
+                        "m" -> "Macho"
+                        "h" -> "Hembra"
+                        else -> "Seleccione género"
+                    },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("* Género") },
+                    isError = estado.erroresVaca.genero != null,
+                    supportingText = {
+                        estado.erroresVaca.genero?.let {
+                            Text(it, color = MaterialTheme.colorScheme.error)
+                        }
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    listOf("Macho" to "m", "Hembra" to "h").forEach { (label, value) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                viewModel.onGeneroChange(value)
+                                expanded = false
+                            }
                         )
+                    }
+                }
+            }
+
+            // Raza
+            OutlinedTextField(
+                value = estado.raza,
+                onValueChange = viewModel::onRazaChange,
+                label = { Text("* Raza") },
+                placeholder = { Text("Ingrese la raza de la vaca") },
+                isError = estado.erroresVaca.raza != null,
+                supportingText = {
+                    estado.erroresVaca.raza?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
-            // Campo Raza
+            // Ubicación
             OutlinedTextField(
-                value = raza,
-                onValueChange = { raza = it },
-                label = { Text("Raza") },
-                placeholder = { Text("Ej: Holstein, Jersey, Angus") },
+                value = estado.ubicacion,
+                onValueChange = viewModel::onUbicacionChange,
+                label = { Text("* Ubicación") },
+                placeholder = { Text("Ingrese ubicación de la vaca") },
+                isError = estado.erroresVaca.ubicacion != null,
+                supportingText = {
+                    estado.erroresVaca.ubicacion?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
-            // Campos en fila (Edad y Peso)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Edad
+            // Enfermedades
+            Column {
+                Text("Enfermedades", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("Máx. 150 caracteres", fontSize = 12.sp, color = Color(0xFFB2ACAC))
+                Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
-                    value = edad,
-                    onValueChange = {
-                        // Solo permite números
-                        if (it.isEmpty() || it.all { char -> char.isDigit() }) {
-                            edad = it
-                        }
-                    },
-                    label = { Text("Edad (años)") },
-                    placeholder = { Text("Ej: 3") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    )
-                )
-
-                // Peso
-                OutlinedTextField(
-                    value = peso,
-                    onValueChange = {
-                        // Solo permite números y un punto decimal
-                        if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) {
-                            peso = it
-                        }
-                    },
-                    label = { Text("Peso (kg)") },
-                    placeholder = { Text("Ej: 450") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal
-                    )
-                )
-            }
-
-            // Campo Observaciones
-            OutlinedTextField(
-                value = observaciones,
-                onValueChange = { observaciones = it },
-                label = { Text("Observaciones") },
-                placeholder = { Text("Notas adicionales sobre la vaca...") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                maxLines = 5
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Card informativa
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = "* Campos obligatorios",
-                    modifier = Modifier.padding(12.dp),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                    value = estado.enfermedades,
+                    onValueChange = viewModel::onEnfermedadesChange,
+                    placeholder = { Text("Escriba aquí...") },
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    maxLines = 5,
+                    supportingText = {
+                        Text(
+                            "${estado.enfermedades.length}/150",
+                            fontSize = 12.sp,
+                            color = if (estado.enfermedades.length >= 150)
+                                MaterialTheme.colorScheme.error else Color.Gray
+                        )
+                    }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón Guardar
+            // Botón Crear
             Button(
                 onClick = {
-                    // Validar campos obligatorios
-                    codigoError = codigo.isBlank()
-
-                    if (!codigoError) {
-                        // Aquí guardarías los datos (ViewModelo, BD, etc.)
-                        // Por ahora solo vuelve atrás
+                    if (viewModel.validarFormulario()) {
+                        viewModel.limpiarFormulario()
                         navController.navigateUp()
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1DB954),  // Verde Spotify
+                    containerColor = Color(0xFF1DB954),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(
-                    "GUARDAR VACA",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("CREAR VACA", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
-
-            // Botón Cancelar
-            OutlinedButton(
-                onClick = { navController.navigateUp() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("CANCELAR")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
