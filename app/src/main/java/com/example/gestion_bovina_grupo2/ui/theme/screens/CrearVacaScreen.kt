@@ -20,7 +20,6 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrearVacaScreen(navController: NavController) {
-    var nombre by remember { mutableStateOf("") }
     var codigo by remember { mutableStateOf("") }
     var raza by remember { mutableStateOf("") }
     var edad by remember { mutableStateOf("") }
@@ -68,28 +67,6 @@ fun CrearVacaScreen(navController: NavController) {
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-
-            // Campo Nombre
-            OutlinedTextField(
-                value = nombre,
-                onValueChange = {
-                    nombre = it
-                    nombreError = false
-                },
-                label = { Text("Nombre *") },
-                placeholder = { Text("Ej: Clarita") },
-                isError = nombreError,
-                supportingText = {
-                    if (nombreError) {
-                        Text(
-                            "El nombre es obligatorio",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
             )
 
             // Campo Código
@@ -202,10 +179,9 @@ fun CrearVacaScreen(navController: NavController) {
             Button(
                 onClick = {
                     // Validar campos obligatorios
-                    nombreError = nombre.isBlank()
                     codigoError = codigo.isBlank()
 
-                    if (!nombreError && !codigoError) {
+                    if (!codigoError) {
                         // Aquí guardarías los datos (ViewModelo, BD, etc.)
                         // Por ahora solo vuelve atrás
                         navController.navigateUp()
