@@ -9,8 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.gestion_bovina_grupo2.ui.theme.screens.CrearVacaScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen
+import com.example.gestion_bovina_grupo2.ui.theme.screens.ReportesScreen
 
 @Composable
 fun AppNavigation() {
@@ -43,6 +45,22 @@ fun AppNavigation() {
             ) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
                     HomeScreen(navController = navController)
+                }
+            }
+        }
+
+        // Crear Vaca (SIN menú, tiene botón atrás)
+        composable("crear") {
+            CrearVacaScreen(navController = navController)
+        }
+
+        // Reportes (CON menú)
+        composable("reportes") {
+            Scaffold(
+                bottomBar = { BottomNavBar(navController = navController) }
+            ) { paddingValues ->
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    ReportesScreen(navController = navController)
                 }
             }
         }
