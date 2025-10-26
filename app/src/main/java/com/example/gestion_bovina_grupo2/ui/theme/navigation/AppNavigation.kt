@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.gestion_bovina_grupo2.ui.theme.compose.SplashScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.CrearVacaScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen
@@ -22,8 +23,11 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = "splash"
     ) {
+        composable("splash"){
+            SplashScreen(navController=navController)
+        }
         // Login (SIN menú)
         composable("login") {
             LoginScreen(navController = navController)
