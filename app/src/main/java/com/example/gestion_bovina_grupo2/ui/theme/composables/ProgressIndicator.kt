@@ -1,4 +1,4 @@
-package com.example.gestion_bovina_grupo2.ui.theme.compose
+package com.example.gestion_bovina_grupo2.ui.theme.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LinearProgressIndicator
@@ -67,6 +67,8 @@ suspend fun loadProgress(updateProgress: (Float) -> Unit) {
         delay(25) // Controla la velocidad del progreso
     }
 }
+
+
 
 @Preview
 @Composable

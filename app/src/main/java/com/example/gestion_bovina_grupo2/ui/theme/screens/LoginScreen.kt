@@ -98,7 +98,7 @@ fun LoginScreen(
                     onClick = {
                         if (viewModel.validarLogin()){
                             navController.navigate("inicio"){
-                                popUpTo("login") { inclusive = true }
+                                popUpTo("home") { inclusive = true }
                             }
                         }
                     },
