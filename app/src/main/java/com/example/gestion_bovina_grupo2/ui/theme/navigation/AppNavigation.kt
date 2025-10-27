@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -46,7 +45,7 @@ fun AppNavigation() {
             LoginScreen(navController = navController)
         }
 
-        // Puedes mantener ambas rutas a Home si ya las usabas
+        //
         composable("inicio") {
             Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
@@ -58,16 +57,7 @@ fun AppNavigation() {
             }
         }
 
-        composable("home") {
-            Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues)) {
-                    HomeScreen(
-                        navController = navController,
-                        viewModel = vacaViewModel
-                    )
-                }
-            }
-        }
+
 
         composable("crear") {
             Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->

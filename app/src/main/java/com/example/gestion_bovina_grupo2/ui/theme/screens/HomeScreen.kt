@@ -54,7 +54,6 @@ fun HomeScreen(
 
         Spacer(Modifier.height(8.dp))
 
-        // KPIs en fila: Total (izq) y Registradas hoy (der)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
