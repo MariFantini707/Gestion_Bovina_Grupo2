@@ -27,11 +27,11 @@ A través de esta aplicación, se busca optimizar y agilizar el proceso de regis
     
     6. Sincronizar las dependencias de la app para que no existan errores (aparecerá en la parte superior de arriba una notificación recomendando realizar un "Sync project with gradle files".
 
-    7. Al seleccionar un dispositivo, seleccionar la API 36.1
+    7. Ir al apartado de "Device manager" y luego seleccionar la API 36.1
 
-    8.
+    8. Una vez que se visualice la pantalla, debe presionar el logo de encendido/apagado
 
-    9.
+    9. Y por último debe ejecutar la app en MainActivity (el logo de inicio en la parte superior)
    
    ```bash
    https://github.com/MariFantini707/Gestion_Bovina_Grupo2.git
