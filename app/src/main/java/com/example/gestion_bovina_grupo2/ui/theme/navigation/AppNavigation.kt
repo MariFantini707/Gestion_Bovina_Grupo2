@@ -13,7 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
 import com.example.gestion_bovina_grupo2.repository.ContadorRepository
-import com.example.gestion_bovina_grupo2.ui.theme.compose.SplashScreen
+import com.example.gestion_bovina_grupo2.ui.theme.composables.SplashScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.CrearVacaScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen

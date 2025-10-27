@@ -21,7 +21,7 @@ fun SplashScreen(navController: NavController) {
     var loading by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
 
-    // Lógica para navegar al login después de 3 segundos
+    // Esta es la lógica para navegar al login después de 3 segundos
     LaunchedEffect(Unit) {
         scope.launch {
             loadProgress { progress ->
@@ -73,7 +73,7 @@ suspend fun loadProgress(updateProgress: (Float) -> Unit) {
 @Preview
 @Composable
 fun PreviewSplashScreen() {
-    // Previa de la pantalla de carga, usa un NavController simulado
+    // Previa de la pantalla de carga con un NavController simulado
     val navController = rememberNavController()
     SplashScreen(navController = navController)
 }
