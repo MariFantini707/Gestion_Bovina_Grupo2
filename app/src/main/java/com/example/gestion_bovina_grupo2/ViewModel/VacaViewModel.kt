@@ -1,75 +1,88 @@
 package com.example.gestion_bovina_grupo2.ViewModel
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.gestion_bovina_grupo2.model.Vaca
 import com.example.gestion_bovina_grupo2.model.VacaErrores
+import com.example.gestion_bovina_grupo2.repository.ContadorRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class VacaViewModel : ViewModel() {
+private val FECHA_REGEX = Regex("""^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/(19|20)\d{2}$""")
 
+private val SDF = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+    isLenient = false // evita 32/13/2025, etc.
+}
+
+private fun parseFechaOrNull(texto: String): Date? = try {
+    SDF.parse(texto)
+} catch (_: Exception) { null }
+
+class VacaViewModel(
+    private val contadorRepo: ContadorRepository
+) : ViewModel() {
+
+    // Formulario
     private val _estado = MutableStateFlow(Vaca())
     val estado: StateFlow<Vaca> = _estado
 
-    fun onDiioChange(valor: String) {
-        _estado.update {
-            it.copy(
-                diio = valor,
-                erroresVaca = it.erroresVaca.copy(diio = null)
-            )
+    // Lista en memoria (si quieres también persistirla, lo vemos luego)
+    private val _vacas = MutableStateFlow<List<Vaca>>(emptyList())
+    val vacas: StateFlow<List<Vaca>> = _vacas
+
+    // Contadores (persistentes)
+    private val _totalVacas = MutableStateFlow(0)
+    val totalVacas: StateFlow<Int> = _totalVacas
+
+    private val _registradasHoy = MutableStateFlow(0)
+    val registradasHoy: StateFlow<Int> = _registradasHoy
+
+    init {
+        // Cargar contadores desde DataStore al iniciar el VM
+        viewModelScope.launch {
+            val c = contadorRepo.getCountersOnce()
+            _totalVacas.value = c.total
+            _registradasHoy.value = c.hoy
         }
     }
 
-    fun onFechaChange(valor: String) {
-        _estado.update {
-            it.copy(
-                fecha = valor,
-                erroresVaca = it.erroresVaca.copy(fecha = null)
-            )
-        }
+    // ----------------- setters del formulario -----------------
+    fun onDiioChange(v: String) = _estado.update { it.copy(diio = v, erroresVaca = it.erroresVaca.copy(diio = null)) }
+    fun onFechaChange(v: String) = _estado.update { it.copy(fecha = v, erroresVaca = it.erroresVaca.copy(fecha = null)) }
+    fun onGeneroChange(v: String) = _estado.update { it.copy(genero = v, erroresVaca = it.erroresVaca.copy(genero = null)) }
+    fun onRazaChange(v: String) = _estado.update { it.copy(raza = v, erroresVaca = it.erroresVaca.copy(raza = null)) }
+    fun onUbicacionChange(v: String) = _estado.update { it.copy(ubicacion = v, erroresVaca = it.erroresVaca.copy(ubicacion = null)) }
+    fun onEnfermedadesChange(v: String) {
+        if (v.length <= 150) _estado.update { it.copy(enfermedades = v, erroresVaca = it.erroresVaca.copy(enfermedades = null)) }
     }
 
-    fun onGeneroChange(valor: String) {
-        _estado.update {
-            it.copy(
-                genero = valor,
-                erroresVaca = it.erroresVaca.copy(genero = null)
-            )
-        }
-    }
-
-    fun onRazaChange(valor: String) {
-        _estado.update {
-            it.copy(
-                raza = valor,
-                erroresVaca = it.erroresVaca.copy(raza = null)
-            )
-        }
-    }
-
-    fun onUbicacionChange(valor: String) {
-        _estado.update {
-            it.copy(
-                ubicacion = valor,
-                erroresVaca = it.erroresVaca.copy(ubicacion = null)
-            )
-        }
-    }
-
-    fun onEnfermedadesChange(valor: String) {
-        if (valor.length <= 150) {
-            _estado.update {
-                it.copy(
-                    enfermedades = valor,
-                    erroresVaca = it.erroresVaca.copy(enfermedades = null)
-                )
-            }
-        }
-    }
-
+    // ----------------- validación (la tuya) -----------------
     fun validarFormulario(): Boolean {
         val estadoActual = _estado.value
+
+        // --- Validación de fecha (String -> dd/MM/yyyy) ---
+        val fechaError: String? = when {
+            estadoActual.fecha.trim().isEmpty() ->
+                "Ingrese una fecha! ⚠️"
+
+            !FECHA_REGEX.matches(estadoActual.fecha) ->
+                "Formato inválido (dd/MM/aaaa) ⚠️"
+
+            parseFechaOrNull(estadoActual.fecha) == null ->
+                "Fecha inválida ⚠️"
+
+            // Evitar fechas futuras (opcional, deja o quita esta regla)
+            parseFechaOrNull(estadoActual.fecha)!!.after(Date()) ->
+                "La fecha no puede ser futura ⚠️"
+
+            else -> null
+        }
 
         val erroresVaca = VacaErrores(
             diio = when {
@@ -77,23 +90,14 @@ class VacaViewModel : ViewModel() {
                 !estadoActual.diio.all { it.isDigit() } -> "Ingrese solo números! ⚠️"
                 else -> null
             },
-            fecha = when {
-                estadoActual.fecha.trim().isEmpty() -> "Ingrese una fecha! ⚠️"
-                else -> null
-            },
+            fecha = fechaError,
             genero = when {
-                estadoActual.genero.isEmpty() ||
-                        !listOf("m", "h").contains(estadoActual.genero) -> "Ingrese el género ⚠️"
+                estadoActual.genero.isEmpty() || !listOf("m", "h").contains(estadoActual.genero) ->
+                    "Ingrese el género ⚠️"
                 else -> null
             },
-            raza = when {
-                estadoActual.raza.trim().isEmpty() -> "Ingrese la raza! ⚠️"
-                else -> null
-            },
-            ubicacion = when {
-                estadoActual.ubicacion.trim().isEmpty() -> "Ingrese una ubicación! ⚠️"
-                else -> null
-            }
+            raza = if (estadoActual.raza.trim().isEmpty()) "Ingrese la raza! ⚠️" else null,
+            ubicacion = if (estadoActual.ubicacion.trim().isEmpty()) "Ingrese una ubicación! ⚠️" else null
         )
 
         val hayErrores = listOfNotNull(
@@ -108,11 +112,37 @@ class VacaViewModel : ViewModel() {
             _estado.update { it.copy(erroresVaca = erroresVaca) }
             return false
         }
-
         return true
     }
 
-    fun limpiarFormulario() {
-        _estado.value = Vaca()
+    // ----------------- crear vaca + persistir contadores -----------------
+    fun crearVaca(): Boolean {
+        if (!validarFormulario()) return false
+
+        val nueva = _estado.value.copy()
+        _vacas.update { it + nueva }
+
+        // Actualiza Y persiste contadores en DataStore
+        viewModelScope.launch {
+            val c = contadorRepo.incrementOnVacaGuardada()
+            _totalVacas.value = c.total
+            _registradasHoy.value = c.hoy
+        }
+
+        limpiarFormulario()
+        return true
+    }
+
+    fun limpiarFormulario() { _estado.value = Vaca() }
+
+    // Factory para crear el ViewModel con el repo
+    companion object {
+        fun provideFactory(repo: ContadorRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return VacaViewModel(repo) as T
+                }
+            }
     }
 }
