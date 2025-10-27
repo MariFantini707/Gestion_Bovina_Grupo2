@@ -27,7 +27,7 @@ A través de esta aplicación, se busca optimizar y agilizar el proceso de regis
     
     6. Sincronizar las dependencias de la app para que no existan errores (aparecerá en la parte superior de arriba una notificación recomendando realizar un "Sync project with gradle files".
 
-    7. 
+    7. Al seleccionar un dispositivo, seleccionar la API 36.1
 
     8.
 
