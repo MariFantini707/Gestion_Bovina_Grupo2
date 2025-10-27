@@ -31,7 +31,7 @@ A través de esta aplicación, se busca optimizar y agilizar el proceso de regis
 
     8. Una vez que se visualice la pantalla, debe presionar el logo de encendido/apagado
 
-    9. Y por último debe ejecutar la app en MainActivity (el logo de inicio en la parte superior)
+    9. Por último debe ejecutar la app en MainActivity (el logo de inicio en la parte superior)
    
    ```bash
    https://github.com/MariFantini707/Gestion_Bovina_Grupo2.git
