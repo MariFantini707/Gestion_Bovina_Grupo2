@@ -13,8 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
 import com.example.gestion_bovina_grupo2.repository.ContadorRepository
-import com.example.gestion_bovina_grupo2.ui.theme.composables.SplashScreen
-
+import com.example.gestion_bovina_grupo2.ui.theme.compose.SplashScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.CrearVacaScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen
@@ -46,8 +45,7 @@ fun AppNavigation() {
             LoginScreen(navController = navController)
         }
 
-
-        // Puedes mantener ambas rutas a Home si ya las usabas
+        //
         composable("inicio") {
             Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
@@ -59,17 +57,6 @@ fun AppNavigation() {
             }
         }
 
-
-        composable("home") {
-            Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues)) {
-                    HomeScreen(
-                        navController = navController,
-                        viewModel = vacaViewModel
-                    )
-                }
-            }
-        }
 
 
         composable("crear") {

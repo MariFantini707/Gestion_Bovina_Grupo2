@@ -34,7 +34,6 @@ class VacaViewModel(
 
     // Lista en memoria (si quieres también persistirla, lo vemos luego)
     private val _vacas = MutableStateFlow<List<Vaca>>(emptyList())
-    val vacas: StateFlow<List<Vaca>> = _vacas
 
     // Contadores (persistentes)
     private val _totalVacas = MutableStateFlow(0)
@@ -62,7 +61,7 @@ class VacaViewModel(
         if (v.length <= 150) _estado.update { it.copy(enfermedades = v, erroresVaca = it.erroresVaca.copy(enfermedades = null)) }
     }
 
-    // ----------------- validación (la tuya) -----------------
+    // ----------------- validación -----------------
     fun validarFormulario(): Boolean {
         val estadoActual = _estado.value
 
