@@ -1,13 +1,11 @@
 package com.example.gestion_bovina_grupo2.ui.theme.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,205 +14,160 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CrearVacaScreen(navController: NavController) {
-    var codigo by remember { mutableStateOf("") }
-    var raza by remember { mutableStateOf("") }
-    var edad by remember { mutableStateOf("") }
-    var peso by remember { mutableStateOf("") }
-    var observaciones by remember { mutableStateOf("") }
+fun CrearVacaScreen(
+    navController: NavController,
+    viewModel: VacaViewModel
+) {
+    val estado by viewModel.estado.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    // Estados de error
-    var nombreError by remember { mutableStateOf(false) }
-    var codigoError by remember { mutableStateOf(false) }
+    // Dropdown de género
+    var generoExpanded by remember { mutableStateOf(false) }
+    val generoOptions = listOf(
+        "m" to "Macho (m)",
+        "h" to "Hembra (h)"
+    )
+    fun generoDisplay(code: String): String =
+        generoOptions.firstOrNull { it.first == code }?.second ?: ""
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Registrar Nueva Vaca",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            Icons.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1DB954),
-                    titleContentColor = Color.White
-                )
+            CenterAlignedTopAppBar(
+                title = { Text("Registrar nueva vaca 🐄", fontWeight = FontWeight.Bold) }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Complete los datos de la vaca",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-
-            // Campo Código
+            // DIIO
             OutlinedTextField(
-                value = codigo,
-                onValueChange = {
-                    codigo = it.uppercase()
-                    codigoError = false
-                },
-                label = { Text("Código de identificación *") },
-                placeholder = { Text("Ej: COD-001") },
-                isError = codigoError,
-                supportingText = {
-                    if (codigoError) {
-                        Text(
-                            "El código es obligatorio",
-                            color = MaterialTheme.colorScheme.error
+                value = estado.diio,
+                onValueChange = { viewModel.onDiioChange(it) },
+                label = { Text("DIIO") },
+                isError = estado.erroresVaca.diio != null,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+            if (estado.erroresVaca.diio != null) {
+                Text(estado.erroresVaca.diio!!, color = Color.Red, fontSize = 12.sp)
+            }
+
+            // Fecha
+            OutlinedTextField(
+                value = estado.fecha,
+                onValueChange = { viewModel.onFechaChange(it) },
+                label = { Text("Fecha dd/mm/yyyy") },
+                isError = estado.erroresVaca.fecha != null,
+                modifier = Modifier.fillMaxWidth()
+            )
+            if (estado.erroresVaca.fecha != null) {
+                Text(estado.erroresVaca.fecha!!, color = Color.Red, fontSize = 12.sp)
+            }
+
+            // Género (select / dropdown)
+            ExposedDropdownMenuBox(
+                expanded = generoExpanded,
+                onExpandedChange = { generoExpanded = !generoExpanded }
+            ) {
+                TextField(
+                    value = generoDisplay(estado.genero),
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Género") },
+                    isError = estado.erroresVaca.genero != null,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = generoExpanded) },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = generoExpanded,
+                    onDismissRequest = { generoExpanded = false }
+                ) {
+                    generoOptions.forEach { (code, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                viewModel.onGeneroChange(code) // guarda "m" o "h"
+                                generoExpanded = false
+                            }
                         )
                     }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
+                }
+            }
+            if (estado.erroresVaca.genero != null) {
+                Text(estado.erroresVaca.genero!!, color = Color.Red, fontSize = 12.sp)
+            }
 
-            // Campo Raza
+            // Raza
             OutlinedTextField(
-                value = raza,
-                onValueChange = { raza = it },
+                value = estado.raza,
+                onValueChange = { viewModel.onRazaChange(it) },
                 label = { Text("Raza") },
-                placeholder = { Text("Ej: Holstein, Jersey, Angus") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                isError = estado.erroresVaca.raza != null,
+                modifier = Modifier.fillMaxWidth()
             )
-
-            // Campos en fila (Edad y Peso)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Edad
-                OutlinedTextField(
-                    value = edad,
-                    onValueChange = {
-                        // Solo permite números
-                        if (it.isEmpty() || it.all { char -> char.isDigit() }) {
-                            edad = it
-                        }
-                    },
-                    label = { Text("Edad (años)") },
-                    placeholder = { Text("Ej: 3") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    )
-                )
-
-                // Peso
-                OutlinedTextField(
-                    value = peso,
-                    onValueChange = {
-                        // Solo permite números y un punto decimal
-                        if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) {
-                            peso = it
-                        }
-                    },
-                    label = { Text("Peso (kg)") },
-                    placeholder = { Text("Ej: 450") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal
-                    )
-                )
+            if (estado.erroresVaca.raza != null) {
+                Text(estado.erroresVaca.raza!!, color = Color.Red, fontSize = 12.sp)
             }
 
-            // Campo Observaciones
+            // Ubicación
             OutlinedTextField(
-                value = observaciones,
-                onValueChange = { observaciones = it },
-                label = { Text("Observaciones") },
-                placeholder = { Text("Notas adicionales sobre la vaca...") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                maxLines = 5
+                value = estado.ubicacion,
+                onValueChange = { viewModel.onUbicacionChange(it) },
+                label = { Text("Ubicación") },
+                isError = estado.erroresVaca.ubicacion != null,
+                modifier = Modifier.fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Card informativa
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = "* Campos obligatorios",
-                    modifier = Modifier.padding(12.dp),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
+            if (estado.erroresVaca.ubicacion != null) {
+                Text(estado.erroresVaca.ubicacion!!, color = Color.Red, fontSize = 12.sp)
             }
+
+            // Enfermedades
+            OutlinedTextField(
+                value = estado.enfermedades,
+                onValueChange = { viewModel.onEnfermedadesChange(it) },
+                label = { Text("Enfermedades (opcional)") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón Guardar
             Button(
                 onClick = {
-                    // Validar campos obligatorios
-                    codigoError = codigo.isBlank()
-
-                    if (!codigoError) {
-                        // Aquí guardarías los datos (ViewModelo, BD, etc.)
-                        // Por ahora solo vuelve atrás
-                        navController.navigateUp()
+                    if (viewModel.crearVaca()) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("✓ Vaca registrada con éxito!")
+                        }
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("❌ Corrige los errores del formulario")
+                        }
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1DB954),  // Verde Spotify
+                    containerColor = Color(0xFF1DB954),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(
-                    "GUARDAR VACA",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("CREAR VACA", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
-
-            // Botón Cancelar
-            OutlinedButton(
-                onClick = { navController.navigateUp() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("CANCELAR")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

@@ -113,7 +113,13 @@ fun LoginScreen(
                     Text("Iniciar sesión")
                 }
 
-
+                estado.errores.loginGeneral?.let { msg ->
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = msg,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
 
             }
         }
