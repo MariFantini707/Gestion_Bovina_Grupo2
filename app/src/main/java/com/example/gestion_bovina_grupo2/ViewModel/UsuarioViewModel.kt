@@ -1,20 +1,30 @@
-package com.example.gestion_bovina_grupo2.ViewModel
+package com.example.gestion_bovina_grupo2.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.viewModelScope
 import com.example.gestion_bovina_grupo2.model.Usuario
 import com.example.gestion_bovina_grupo2.model.UsuarioErrores
+import com.example.gestion_bovina_grupo2.repository.UsuarioRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
+class UsuarioViewModel(context: Context) : ViewModel() {
 
-private const val EMAIL_VALIDO = "admin@mail.com"
-private const val PASSWORD_VALIDA = "123456"
+    // Repositorio
+    private val repository = UsuarioRepository(context)
 
-class UsuarioViewModel : ViewModel() {
-
+    // Estado del formulario
     private val _estado = MutableStateFlow(Usuario())
     val estado: StateFlow<Usuario> = _estado
+
+    // Estado de carga
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    // ========== FUNCIONES PARA ACTUALIZAR CAMPOS ==========
 
     fun onEmailChange(valor: String) {
         _estado.update {
@@ -34,11 +44,16 @@ class UsuarioViewModel : ViewModel() {
         }
     }
 
-    // Validación del formulario LOGIN
-    fun validarLogin(): Boolean {
+    // ========== FUNCIÓN PARA VALIDAR Y HACER LOGIN ==========
+
+    /**
+     * Función que obtiene los datos en segundo plano
+     * usando viewModelScope.launch (corrutina)
+     */
+    fun validarYLogin(onSuccess: () -> Unit) {
         val estadoActual = _estado.value
 
-        // Primero valida que los campos no estén vacíos
+        // Validar campos vacíos
         val errores = UsuarioErrores(
             email = when {
                 estadoActual.email.isBlank() -> "El correo es obligatorio"
@@ -50,33 +65,75 @@ class UsuarioViewModel : ViewModel() {
             }
         )
 
-        // Si hay errores de campos vacíos, retorna false
-        val hayErroresCampos = listOfNotNull(
-            errores.email,
-            errores.password
-        ).isNotEmpty()
-
-        if (hayErroresCampos) {
+        // Si hay errores, mostrarlos y no continuar
+        if (errores.email != null || errores.password != null) {
             _estado.update { it.copy(errores = errores) }
-            return false
+            return
         }
 
-        // Ahora valida las credenciales
-        val credencialesCorrectas = estadoActual.email == EMAIL_VALIDO &&
-                estadoActual.password == PASSWORD_VALIDA
+        // Si no hay errores, hacer login con la API
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
 
-        if (!credencialesCorrectas) {
-            val erroresLogin = errores.copy(
-                loginGeneral = "Correo o contraseña incorrectos"
-            )
-            _estado.update { it.copy(errores = erroresLogin) }
-            return false
+                // Llamar al repositorio
+                val token = repository.login(
+                    email = estadoActual.email,
+                    password = estadoActual.password
+                )
+
+                _isLoading.value = false
+
+                if (token != null) {
+                    // Login exitoso
+                    println("✅ Login exitoso. Token: $token")
+                    limpiarFormulario()
+                    onSuccess()
+                } else {
+                    // Error en el login
+                    _estado.update {
+                        it.copy(
+                            errores = it.errores.copy(
+                                loginGeneral = "Correo o contraseña incorrectos"
+                            )
+                        )
+                    }
+                }
+
+            } catch (e: Exception) {
+                _isLoading.value = false
+                println("❌ Error al obtener datos: ${e.localizedMessage}")
+                _estado.update {
+                    it.copy(
+                        errores = it.errores.copy(
+                            loginGeneral = "Error de conexión con el servidor"
+                        )
+                    )
+                }
+            }
         }
-
-        // Todo correcto
-        return true
     }
 
+    // ========== FUNCIÓN PARA CERRAR SESIÓN ==========
+
+    /**
+     * Cierra la sesión del usuario
+     * Limpia el token de SharedPreferences
+     * y resetea el formulario
+     */
+    fun logout() {
+        // Limpiar token del repositorio (SharedPreferences)
+        repository.cerrarSesion()
+
+        // Limpiar formulario
+        limpiarFormulario()
+
+        println("🚪 Sesión cerrada. Token eliminado.")
+    }
+
+    /**
+     * Limpia el formulario
+     */
     fun limpiarFormulario() {
         _estado.value = Usuario()
     }

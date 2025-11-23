@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.gestion_bovina_grupo2.viewmodel.UsuarioViewModel
 import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
 import com.example.gestion_bovina_grupo2.repository.ContadorRepository
 import com.example.gestion_bovina_grupo2.ui.theme.composables.SplashScreen
@@ -22,32 +23,64 @@ import com.example.gestion_bovina_grupo2.ui.theme.screens.ReportesScreen
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-
-    // 1) Repositorio de DataStore para contadores
     val context = LocalContext.current
-    val contadorRepo = remember(context) { ContadorRepository(context) }
 
-    // 2) VacaViewModel compartido en el grafo usando la factory que recibe el repo
+    // ========== VIEW MODELS ==========
+
+    // UsuarioViewModel (para login y logout)
+    val usuarioViewModel = remember {
+        UsuarioViewModel(context)
+    }
+
+    // Repositorio de DataStore para contadores (tu código existente)
+    val contadorRepo = remember { ContadorRepository(context) }
+
+    // VacaViewModel compartido en el grafo (tu código existente)
     val vacaViewModel: VacaViewModel = viewModel(
         factory = VacaViewModel.provideFactory(contadorRepo)
     )
 
-    // 3) Grafo de navegación
+    // ========== FUNCIÓN DE LOGOUT ==========
+    val handleLogout: () -> Unit = {
+        // Limpiar el token usando el ViewModel
+        usuarioViewModel.logout()
+
+        // Navegar al login y limpiar el back stack
+        navController.navigate("login") {
+            popUpTo(0) { inclusive = true } // Limpia toda la pila de navegación
+            launchSingleTop = true
+        }
+    }
+
+    // ========== NAVEGACIÓN ==========
+
     NavHost(
         navController = navController,
         startDestination = "splash"
     ) {
+        // Splash Screen
         composable("splash") {
             SplashScreen(navController = navController)
         }
 
+        // Login Screen
         composable("login") {
-            LoginScreen(navController = navController)
+            LoginScreen(
+                navController = navController,
+                viewModel = usuarioViewModel
+            )
         }
 
-        //
+        // Home Screen (con bottom bar Y logout)
         composable("inicio") {
-            Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->
+            Scaffold(
+                bottomBar = {
+                    BottomNavBar(
+                        navController = navController,
+                        onLogout = handleLogout // ← NUEVO: pasa la función de logout
+                    )
+                }
+            ) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
                     HomeScreen(
                         navController = navController,
@@ -57,10 +90,16 @@ fun AppNavigation() {
             }
         }
 
-
-
+        // Crear Vaca Screen (con bottom bar Y logout)
         composable("crear") {
-            Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->
+            Scaffold(
+                bottomBar = {
+                    BottomNavBar(
+                        navController = navController,
+                        onLogout = handleLogout // ← NUEVO: pasa la función de logout
+                    )
+                }
+            ) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
                     CrearVacaScreen(
                         navController = navController,
@@ -70,8 +109,16 @@ fun AppNavigation() {
             }
         }
 
+        // Reportes Screen (con bottom bar Y logout)
         composable("reportes") {
-            Scaffold(bottomBar = { BottomNavBar(navController = navController) }) { paddingValues ->
+            Scaffold(
+                bottomBar = {
+                    BottomNavBar(
+                        navController = navController,
+                        onLogout = handleLogout // ← NUEVO: pasa la función de logout
+                    )
+                }
+            ) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
                     ReportesScreen(navController = navController)
                 }

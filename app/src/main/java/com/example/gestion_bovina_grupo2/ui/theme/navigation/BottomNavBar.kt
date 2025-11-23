@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +14,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.savedstate.savedState
 
 // Como una interfaz en TypeScript
 data class BottomNavItem(
@@ -25,6 +25,7 @@ data class BottomNavItem(
 @Composable
 fun BottomNavBar(
     navController: NavController,
+    onLogout: () -> Unit,  // cerrar sesión
     modifier: Modifier = Modifier
 ) {
     // Obtener la ruta actual (qué pantalla estás viendo)
@@ -95,5 +96,32 @@ fun BottomNavBar(
                 )
             )
         }
+
+        // ========== BOTÓN DE CERRAR SESIÓN ==========
+        NavigationBarItem(
+            selected = false, // Nunca está seleccionado
+            onClick = onLogout, // Ejecuta la función de logout
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Logout,
+                    contentDescription = "Cerrar Sesión",
+                    modifier = Modifier.size(24.dp)
+                )
+            },
+            label = {
+                Text(
+                    text = "Salir",
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1
+                )
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.White,
+                selectedTextColor = Color.White,
+                unselectedIconColor = Color(0xFFFFCDD2), // Rojo claro para destacar
+                unselectedTextColor = Color(0xFFFFCDD2),
+                indicatorColor = Color(0xFFE53935) // Rojo cuando se presiona
+            )
+        )
     }
 }
