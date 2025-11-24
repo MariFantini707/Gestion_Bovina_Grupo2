@@ -3,29 +3,80 @@ package com.example.gestion_bovina_grupo2.ui.theme.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
+import com.example.gestion_bovina_grupo2.ViewModel.VacaApiViewModel
+import com.example.gestion_bovina_grupo2.data.model.VacaRequest
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrearVacaScreen(
-    navController: NavController,
-    viewModel: VacaViewModel
+    navController: NavController
 ) {
-    val estado by viewModel.estado.collectAsState()
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    // ========== SOLO VacaApiViewModel ==========
+    val viewModel = remember { VacaApiViewModel(context) }
+
+    // Estados del formulario
+    val diio by viewModel.diio.collectAsState()
+    val genero by viewModel.genero.collectAsState()
+    val raza by viewModel.raza.collectAsState()
+    val ubicacion by viewModel.ubicacion.collectAsState()
+    val enfermedades by viewModel.enfermedades.collectAsState()
+
+    // Errores de validación
+    val diioError by viewModel.diioError.collectAsState()
+    val generoError by viewModel.generoError.collectAsState()
+    val razaError by viewModel.razaError.collectAsState()
+    val ubicacionError by viewModel.ubicacionError.collectAsState()
+
+    // Estados de API
+    val isCreating by viewModel.isCreating.collectAsState()
+    val createSuccess by viewModel.createSuccess.collectAsState()
+    val createError by viewModel.createError.collectAsState()
+
+    // ========== DatePicker State ==========
+    val datePickerState = rememberDatePickerState()
+    var showDatePicker by remember { mutableStateOf(false) }
+    var fechaSeleccionada by remember { mutableStateOf<Long?>(null) }
+
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    val fechaMostrada = remember(fechaSeleccionada) {
+        fechaSeleccionada?.let { dateFormatter.format(Date(it)) } ?: ""
+    }
+
+    // ========== Detectar éxito y navegar ==========
+    LaunchedEffect(createSuccess) {
+        if (createSuccess) {
+            snackbarHostState.showSnackbar("✅ Vaca registrada exitosamente!")
+            kotlinx.coroutines.delay(1500)
+            viewModel.resetCreateStates()
+            navController.popBackStack()
+        }
+    }
+
+    // ========== Detectar error ==========
+    LaunchedEffect(createError) {
+        createError?.let { error ->
+            snackbarHostState.showSnackbar("❌ $error")
+        }
+    }
 
     // Dropdown de género
     var generoExpanded by remember { mutableStateOf(false) }
@@ -53,44 +104,50 @@ fun CrearVacaScreen(
         ) {
             // DIIO
             OutlinedTextField(
-                value = estado.diio,
+                value = diio,
                 onValueChange = { viewModel.onDiioChange(it) },
                 label = { Text("DIIO") },
-                isError = estado.erroresVaca.diio != null,
+                isError = diioError != null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isCreating
             )
-            if (estado.erroresVaca.diio != null) {
-                Text(estado.erroresVaca.diio!!, color = Color.Red, fontSize = 12.sp)
+            if (diioError != null) {
+                Text(diioError!!, color = Color.Red, fontSize = 12.sp)
             }
 
-            // Fecha
+            // ========== FECHA CON CALENDARIO ==========
             OutlinedTextField(
-                value = estado.fecha,
-                onValueChange = { viewModel.onFechaChange(it) },
-                label = { Text("Fecha dd/mm/yyyy") },
-                isError = estado.erroresVaca.fecha != null,
-                modifier = Modifier.fillMaxWidth()
+                value = fechaMostrada,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Fecha de Nacimiento") },
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(Icons.Default.DateRange, "Seleccionar fecha")
+                    }
+                },
+                placeholder = { Text("DD/MM/YYYY") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isCreating
             )
-            if (estado.erroresVaca.fecha != null) {
-                Text(estado.erroresVaca.fecha!!, color = Color.Red, fontSize = 12.sp)
-            }
 
             // Género (select / dropdown)
             ExposedDropdownMenuBox(
                 expanded = generoExpanded,
-                onExpandedChange = { generoExpanded = !generoExpanded }
+                onExpandedChange = { generoExpanded = !generoExpanded && !isCreating }
             ) {
                 TextField(
-                    value = generoDisplay(estado.genero),
+                    value = generoDisplay(genero),
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Género") },
-                    isError = estado.erroresVaca.genero != null,
+                    isError = generoError != null,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = generoExpanded) },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    enabled = !isCreating
                 )
                 ExposedDropdownMenu(
                     expanded = generoExpanded,
@@ -100,74 +157,168 @@ fun CrearVacaScreen(
                         DropdownMenuItem(
                             text = { Text(label) },
                             onClick = {
-                                viewModel.onGeneroChange(code) // guarda "m" o "h"
+                                viewModel.onGeneroChange(code)
                                 generoExpanded = false
                             }
                         )
                     }
                 }
             }
-            if (estado.erroresVaca.genero != null) {
-                Text(estado.erroresVaca.genero!!, color = Color.Red, fontSize = 12.sp)
+            if (generoError != null) {
+                Text(generoError!!, color = Color.Red, fontSize = 12.sp)
             }
 
             // Raza
             OutlinedTextField(
-                value = estado.raza,
+                value = raza,
                 onValueChange = { viewModel.onRazaChange(it) },
                 label = { Text("Raza") },
-                isError = estado.erroresVaca.raza != null,
-                modifier = Modifier.fillMaxWidth()
+                isError = razaError != null,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isCreating
             )
-            if (estado.erroresVaca.raza != null) {
-                Text(estado.erroresVaca.raza!!, color = Color.Red, fontSize = 12.sp)
+            if (razaError != null) {
+                Text(razaError!!, color = Color.Red, fontSize = 12.sp)
             }
 
             // Ubicación
             OutlinedTextField(
-                value = estado.ubicacion,
+                value = ubicacion,
                 onValueChange = { viewModel.onUbicacionChange(it) },
                 label = { Text("Ubicación") },
-                isError = estado.erroresVaca.ubicacion != null,
-                modifier = Modifier.fillMaxWidth()
+                isError = ubicacionError != null,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isCreating
             )
-            if (estado.erroresVaca.ubicacion != null) {
-                Text(estado.erroresVaca.ubicacion!!, color = Color.Red, fontSize = 12.sp)
+            if (ubicacionError != null) {
+                Text(ubicacionError!!, color = Color.Red, fontSize = 12.sp)
             }
 
             // Enfermedades
             OutlinedTextField(
-                value = estado.enfermedades,
+                value = enfermedades,
                 onValueChange = { viewModel.onEnfermedadesChange(it) },
                 label = { Text("Enfermedades (opcional)") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isCreating
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // ========== BOTÓN CREAR ==========
             Button(
                 onClick = {
-                    if (viewModel.crearVaca()) {
+                    // 1. Validar fecha
+                    if (fechaSeleccionada == null) {
                         scope.launch {
-                            snackbarHostState.showSnackbar("✓ Vaca registrada con éxito!")
+                            snackbarHostState.showSnackbar("❌ Por favor selecciona una fecha")
                         }
-                    } else {
+                        return@Button
+                    }
+
+                    // 2. Validar formulario
+                    if (!viewModel.validarFormulario()) {
                         scope.launch {
-                            snackbarHostState.showSnackbar("❌ Corrige los errores del formulario")
+                            snackbarHostState.showSnackbar("❌ Por favor completa todos los campos")
+                        }
+                        return@Button
+                    }
+
+                    // 3. Enviar al API
+                    scope.launch {
+                        try {
+                            // Convertir fecha a ISO 8601
+                            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                                timeInMillis = fechaSeleccionada!!
+                                set(Calendar.HOUR_OF_DAY, 0)
+                                set(Calendar.MINUTE, 0)
+                                set(Calendar.SECOND, 0)
+                                set(Calendar.MILLISECOND, 0)
+                            }
+                            val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
+                                timeZone = TimeZone.getTimeZone("UTC")
+                            }
+                            val fechaFormateada = isoFormat.format(calendar.time)
+
+                            // Convertir género
+                            val generoAPI = when(genero) {
+                                "m" -> "M"
+                                "h" -> "F"
+                                else -> "M"
+                            }
+
+                            // Crear request
+                            val vacaRequest = VacaRequest(
+                                diio = diio.toInt(),
+                                dateBirthday = fechaFormateada,
+                                genre = generoAPI,
+                                race = raza,
+                                location = ubicacion,
+                                sick = if (enfermedades.isEmpty()) null else enfermedades
+                            )
+
+                            println("🚀 Enviando vaca al API...")
+                            println("   DIIO: ${vacaRequest.diio}")
+                            println("   Fecha: ${vacaRequest.dateBirthday}")
+                            println("   Género: ${vacaRequest.genre}")
+                            println("   Raza: ${vacaRequest.race}")
+                            println("   Ubicación: ${vacaRequest.location}")
+                            println("   Enfermedad: ${vacaRequest.sick ?: "Ninguna"}")
+
+                            viewModel.crearVaca(vacaRequest)
+
+                        } catch (e: Exception) {
+                            println("❌ Error: ${e.message}")
+                            e.printStackTrace()
+                            snackbarHostState.showSnackbar("❌ Error: ${e.message}")
                         }
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
+                enabled = !isCreating,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF1DB954),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("CREAR VACA", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                if (isCreating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("CREANDO...", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                } else {
+                    Text("CREAR VACA", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
             }
+        }
+    }
+
+    // ========== DIÁLOGO DATE PICKER ==========
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        fechaSeleccionada = datePickerState.selectedDateMillis
+                        showDatePicker = false
+                    }
+                ) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 }

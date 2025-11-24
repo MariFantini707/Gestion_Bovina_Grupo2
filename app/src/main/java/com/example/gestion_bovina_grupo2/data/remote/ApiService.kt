@@ -7,6 +7,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import com.example.gestion_bovina_grupo2.data.model.VacaRequest
+import com.example.gestion_bovina_grupo2.data.model.VacaResponse
 
 interface ApiService {
 
@@ -35,4 +37,16 @@ interface ApiService {
     suspend fun getVacasDesactivadas(
         @Header("Authorization") authorization: String
     ): List<VacaApi>
+
+    /**
+     * CREAR VACA
+     * POST /vacas
+     * @return Json con datos de la vaca creada
+     */
+    @POST("vacas")
+    suspend fun crearVaca(
+        @Header("Authorization") authorization: String,
+        @Body vacaRequest: VacaRequest
+    ): VacaResponse
+
 }
