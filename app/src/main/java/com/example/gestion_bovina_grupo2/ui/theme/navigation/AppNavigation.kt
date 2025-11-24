@@ -102,8 +102,7 @@ fun AppNavigation() {
             ) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
                     CrearVacaScreen(
-                        navController = navController,
-                        viewModel = vacaViewModel
+                        navController = navController
                     )
                 }
             }
