@@ -1,4 +1,4 @@
-package com.example.gestion_bovina_grupo2.viewmodel
+package com.example.gestion_bovina_grupo2.ViewModel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

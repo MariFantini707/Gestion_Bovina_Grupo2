@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.gestion_bovina_grupo2.viewmodel.UsuarioViewModel
+import com.example.gestion_bovina_grupo2.ViewModel.UsuarioViewModel
 import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
 import com.example.gestion_bovina_grupo2.repository.ContadorRepository
 import com.example.gestion_bovina_grupo2.ui.theme.composables.SplashScreen
