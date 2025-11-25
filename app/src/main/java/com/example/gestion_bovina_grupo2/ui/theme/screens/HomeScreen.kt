@@ -257,11 +257,16 @@ fun HomeScreen(
                             vaca = vaca,
                             mostrarBotones = filtroActivo,
                             onEditClick = { vacaSeleccionada ->
-                                println("✏️ Editar vaca: ${vacaSeleccionada.diio}")
-                                // TODO: Navegar a pantalla de edición
+                                println("✏️ Editar vaca: ${vacaSeleccionada.id}")
+                                navController.currentBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("vaca", vacaSeleccionada)
+
+                                // Navegar a formulario (modo editar)
+                                navController.navigate("crear")
                             },
                             onDeleteClick = { vacaSeleccionada ->
-                                println("🗑️ Eliminar vaca: ${vacaSeleccionada.diio}")
+                                println("🗑️ Eliminar vaca: ${vacaSeleccionada.id}")
                                 // TODO: Implementar eliminación
                             }
                         )

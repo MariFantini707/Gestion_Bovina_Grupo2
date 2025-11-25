@@ -78,7 +78,7 @@ class VacaRepository(private val context: Context) {
     /**
      * Crea una nueva vaca
      * POST /vacas
-     * @param vacaRequest Datos de la vaca a crear
+     * @Body vacaRequest Datos de la vaca a crear
      * @return VacaResponse si es exitoso, null si hay error
      */
     suspend fun crearVaca(vacaRequest: VacaRequest): VacaResponse? {
@@ -105,4 +105,34 @@ class VacaRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Editar una vaca
+     * PATCH /vacas
+     * @Body vacaRequest Datos de la vaca a editar
+     * @Param id ID de la vaca a editar
+     * @return VacaResponse si es exitoso, null si hay error
+     */
+    suspend fun editarVaca(id: String, vacaRequest: VacaRequest): VacaResponse? {
+        return try {
+            val token = obtenerToken()
+            if (token == null) {
+                println(" No hay token disponible")
+                return null
+            }
+
+            println(" Haciendo petición PATCH a /vacas/$id...")
+            val response = RetrofitInstance.api.updateVaca(
+                id = id,
+                authorization = "Bearer $token",
+                vacaRequest = vacaRequest
+            )
+            println(" Patch Vaca exitoso! ID: ${response.id}")
+            response
+
+        } catch (e: Exception) {
+            println("❌ Error en Repository.editarVaca(): ${e.message}")
+            e.printStackTrace()
+            null
+        }
+    }
 }

@@ -49,6 +49,17 @@ class VacaApiViewModel(context: Context) : ViewModel() {
     private val _ubicacionError = MutableStateFlow<String?>(null)
     val ubicacionError: StateFlow<String?> = _ubicacionError
 
+    private val _isUpdating = MutableStateFlow(false)
+    val isUpdating: StateFlow<Boolean> = _isUpdating
+
+    private val _updateSuccess = MutableStateFlow(false)
+    val updateSuccess: StateFlow<Boolean> = _updateSuccess
+
+    private val _updateError = MutableStateFlow<String?>(null)
+    val updateError: StateFlow<String?> = _updateError
+
+
+
     // ========== ESTADOS DE API ==========
     private val _vacas = MutableStateFlow<List<VacaApi>>(emptyList())
     val vacas: StateFlow<List<VacaApi>> = _vacas
@@ -248,10 +259,61 @@ class VacaApiViewModel(context: Context) : ViewModel() {
     }
 
     /**
+     * PATCH /vacas/{id} (editar)
+     */
+    fun cargarVacaParaEditar(vaca: VacaApi) {
+        _diio.value = vaca.diio.toString()
+        _genero.value = when(vaca.genre) {
+            "M" -> "m"  // Backend M/F → Formulario m/h
+            "F" -> "h"
+            else -> ""
+        }
+        _raza.value = vaca.race
+        _ubicacion.value = vaca.location
+        _enfermedades.value = vaca.sick ?: ""
+    }
+
+    /**
+     * PATCH /vacas/{id} (editar)
+     */
+    fun editarVaca(id: String, vacaRequest: VacaRequest) {
+        viewModelScope.launch {
+            try {
+                _isUpdating.value = true
+                _updateSuccess.value = false
+                _updateError.value = null
+
+                val response = repository.editarVaca(id, vacaRequest)
+
+                _isUpdating.value = false
+
+                if (response != null) {
+                    _updateSuccess.value = true
+                    limpiarFormulario()
+                    obtenerVacasActivas()
+                } else {
+                    _updateError.value = "Error al editar la vaca"
+                }
+            } catch (e: Exception) {
+                _isUpdating.value = false
+                _updateError.value = "Error: ${e.message}"
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
      * Resetea los estados de creación
      */
     fun resetCreateStates() {
         _createSuccess.value = false
         _createError.value = null
+    }
+    /**
+     * Resetea los estados de edición
+     */
+    fun resetUpdateStates() {
+        _updateSuccess.value = false
+        _updateError.value = null
     }
 }

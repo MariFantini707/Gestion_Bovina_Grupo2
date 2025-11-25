@@ -13,9 +13,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.gestion_bovina_grupo2.ViewModel.UsuarioViewModel
 import com.example.gestion_bovina_grupo2.ViewModel.VacaViewModel
+import com.example.gestion_bovina_grupo2.data.model.VacaApi
 import com.example.gestion_bovina_grupo2.repository.ContadorRepository
 import com.example.gestion_bovina_grupo2.ui.theme.composables.SplashScreen
-import com.example.gestion_bovina_grupo2.ui.theme.screens.CrearVacaScreen
+import com.example.gestion_bovina_grupo2.ui.theme.screens.FormularioVacaScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.HomeScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.LoginScreen
 import com.example.gestion_bovina_grupo2.ui.theme.screens.ReportesScreen
@@ -92,20 +93,14 @@ fun AppNavigation() {
 
         // Crear Vaca Screen (con bottom bar Y logout)
         composable("crear") {
-            Scaffold(
-                bottomBar = {
-                    BottomNavBar(
-                        navController = navController,
-                        onLogout = handleLogout // ← NUEVO: pasa la función de logout
-                    )
-                }
-            ) { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues)) {
-                    CrearVacaScreen(
-                        navController = navController
-                    )
-                }
-            }
+            val vaca = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<VacaApi>("vaca")
+
+            FormularioVacaScreen(
+                navController = navController,
+                vacaParaEditar = vaca  // null = crear, vaca = editar
+            )
         }
 
         // Reportes Screen (con bottom bar Y logout)
@@ -114,7 +109,7 @@ fun AppNavigation() {
                 bottomBar = {
                     BottomNavBar(
                         navController = navController,
-                        onLogout = handleLogout // ← NUEVO: pasa la función de logout
+                        onLogout = handleLogout
                     )
                 }
             ) { paddingValues ->
