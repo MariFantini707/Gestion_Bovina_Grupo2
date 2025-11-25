@@ -32,10 +32,17 @@ fun HomeScreen(
         VacaApiViewModel(context)
     }
 
+    // ========== Snackbar Host State ==========
+    val snackbarHostState = remember { SnackbarHostState() }
+
     // Observar estados del API
     val vacas by vacaApiViewModel.vacas.collectAsState()
     val isLoading by vacaApiViewModel.isLoading.collectAsState()
     val error by vacaApiViewModel.error.collectAsState()
+
+    // ========== ESTADOS DE DELETE ==========
+    val deleteSuccess by vacaApiViewModel.deleteSucces.collectAsState()
+    val deleteError by vacaApiViewModel.deleteError.collectAsState()
 
     // ========== ESTADO DEL FILTRO ==========
     var filtroActivo by remember { mutableStateOf(true) }
@@ -57,6 +64,29 @@ fun HomeScreen(
         }
     }
 
+    // ========== DETECTAR ÉXITO AL ELIMINAR ==========
+    LaunchedEffect(deleteSuccess) {
+        if (deleteSuccess) {
+            snackbarHostState.showSnackbar("✅ Vaca eliminada exitosamente")
+            // Resetear estado
+            vacaApiViewModel.resetDeleteStates()
+            // Recargar lista según filtro activo
+            if (filtroActivo) {
+                vacaApiViewModel.obtenerVacasActivas()
+            } else {
+                vacaApiViewModel.obtenerVacasDesactivadas()
+            }
+        }
+    }
+
+    // ========== DETECTAR ERROR AL ELIMINAR ==========
+    LaunchedEffect(deleteError) {
+        deleteError?.let { error ->
+            snackbarHostState.showSnackbar("❌ $error")
+            vacaApiViewModel.resetDeleteStates()
+        }
+    }
+
     val hoy by viewModel.registradasHoy.collectAsState()
 
     // Fecha de hoy formateada
@@ -68,208 +98,215 @@ fun HomeScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 0.dp)
-    ) {
-        // ========== ENCABEZADO ==========
-        Text(
-            text = "Hola, Administrador 👋",
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-        )
-        Text(
-            text = fechaHoy,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ========== KPIs ==========
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            KpiCard(
-                title = "Total de vacas",
-                value = vacas.size.toString(),
-                modifier = Modifier.weight(1f)
-            )
-            KpiCard(
-                title = "Registradas hoy",
-                value = hoy.toString(),
-                modifier = Modifier.weight(1f)
-            )
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 0.dp)
+        ) {
+            // ========== ENCABEZADO ==========
+            Text(
+                text = "Hola, Administrador 👋",
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = fechaHoy,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // ========== FILTRO DE VACAS ==========
-        FiltroVacas(
-            filtroActivo = filtroActivo,
-            onFiltroChange = { nuevoFiltro ->
-                filtroActivo = nuevoFiltro
+            // ========== KPIs ==========
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                KpiCard(
+                    title = "Total de vacas",
+                    value = vacas.size.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                KpiCard(
+                    title = "Registradas hoy",
+                    value = hoy.toString(),
+                    modifier = Modifier.weight(1f)
+                )
             }
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // ========== TÍTULO DE LISTA ==========
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = if (filtroActivo) "Vacas activas" else "Vacas desactivadas",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-            )
-            Text(
-                text = "(${vacas.size})",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // ========== LISTA DE VACAS ==========
-        when {
-            // Cargando
-            isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = if (filtroActivo)
-                                "Cargando vacas activas..."
-                            else
-                                "Cargando vacas desactivadas...",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                    }
+            // ========== FILTRO DE VACAS ==========
+            FiltroVacas(
+                filtroActivo = filtroActivo,
+                onFiltroChange = { nuevoFiltro ->
+                    filtroActivo = nuevoFiltro
                 }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ========== TÍTULO DE LISTA ==========
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (filtroActivo) "Vacas activas" else "Vacas desactivadas",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = "(${vacas.size})",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
-            // Error
-            error != null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(32.dp)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // ========== LISTA DE VACAS ==========
+            when {
+                // Cargando
+                isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "❌",
-                            fontSize = 48.sp
-                        )
-                        Text(
-                            text = "Error al cargar vacas",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = error ?: "Error desconocido",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Button(
-                            onClick = {
-                                if (filtroActivo) {
-                                    vacaApiViewModel.obtenerVacasActivas()
-                                } else {
-                                    vacaApiViewModel.obtenerVacasDesactivadas()
-                                }
-                            }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Text("Reintentar")
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = if (filtroActivo)
+                                    "Cargando vacas activas..."
+                                else
+                                    "Cargando vacas desactivadas...",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            )
                         }
                     }
                 }
-            }
 
-            // Lista vacía
-            vacas.isEmpty() -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(32.dp)
+                // Error
+                error != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = if (filtroActivo) "🐄" else "😴",
-                            fontSize = 64.sp
-                        )
-                        Text(
-                            text = if (filtroActivo)
-                                "No hay vacas activas"
-                            else
-                                "No hay vacas desactivadas",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = if (filtroActivo)
-                                "Todas tus vacas están desactivadas o aún no has registrado ninguna"
-                            else
-                                "Todas tus vacas están activas",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.padding(32.dp)
+                        ) {
+                            Text(
+                                text = "❌",
+                                fontSize = 48.sp
+                            )
+                            Text(
+                                text = "Error al cargar vacas",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = error ?: "Error desconocido",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Button(
+                                onClick = {
+                                    if (filtroActivo) {
+                                        vacaApiViewModel.obtenerVacasActivas()
+                                    } else {
+                                        vacaApiViewModel.obtenerVacasDesactivadas()
+                                    }
+                                }
+                            ) {
+                                Text("Reintentar")
+                            }
+                        }
                     }
                 }
-            }
 
-            // Lista con vacas
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentPadding = PaddingValues(bottom = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
-                ) {
-                    items(vacas) { vaca ->
-                        VacaCard(
-                            vaca = vaca,
-                            mostrarBotones = filtroActivo,
-                            onEditClick = { vacaSeleccionada ->
-                                println("✏️ Editar vaca: ${vacaSeleccionada.id}")
-                                navController.currentBackStackEntry
-                                    ?.savedStateHandle
-                                    ?.set("vaca", vacaSeleccionada)
+                // Lista vacía
+                vacas.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.padding(32.dp)
+                        ) {
+                            Text(
+                                text = if (filtroActivo) "🐄" else "😴",
+                                fontSize = 64.sp
+                            )
+                            Text(
+                                text = if (filtroActivo)
+                                    "No hay vacas activas"
+                                else
+                                    "No hay vacas desactivadas",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = if (filtroActivo)
+                                    "Todas tus vacas están desactivadas o aún no has registrado ninguna"
+                                else
+                                    "Todas tus vacas están activas",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                }
 
-                                // Navegar a formulario (modo editar)
-                                navController.navigate("crear")
-                            },
-                            onDeleteClick = { vacaSeleccionada ->
-                                println("🗑️ Eliminar vaca: ${vacaSeleccionada.id}")
-                                // TODO: Implementar eliminación
-                            }
-                        )
+                // Lista con vacas
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentPadding = PaddingValues(bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(0.dp)
+                    ) {
+                        items(vacas) { vaca ->
+                            VacaCard(
+                                vaca = vaca,
+                                mostrarBotones = filtroActivo,
+                                onEditClick = { vacaSeleccionada ->
+                                    println("✏️ Editar vaca: ${vacaSeleccionada.id}")
+                                    navController.currentBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("vaca", vacaSeleccionada)
+
+                                    // Navegar a formulario (modo editar)
+                                    navController.navigate("crear")
+                                },
+                                onDeleteClick = { vacaSeleccionada ->
+                                    println("🗑️ Eliminar vaca: ${vacaSeleccionada.id}")
+                                    vacaApiViewModel.eliminarVaca(vacaSeleccionada.id)
+                                }
+                            )
+                        }
                     }
                 }
             }

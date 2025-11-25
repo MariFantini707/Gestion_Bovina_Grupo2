@@ -58,6 +58,16 @@ class VacaApiViewModel(context: Context) : ViewModel() {
     private val _updateError = MutableStateFlow<String?>(null)
     val updateError: StateFlow<String?> = _updateError
 
+    private val _isDeleting = MutableStateFlow(false)
+    val isDeleting: StateFlow<Boolean> = _isDeleting
+
+    private val _deleteSucces = MutableStateFlow(false)
+    val deleteSucces: StateFlow<Boolean> = _deleteSucces
+
+    private val _deleteError = MutableStateFlow<String?>(null)
+    val deleteError: StateFlow<String?> = _deleteError
+
+
 
 
     // ========== ESTADOS DE API ==========
@@ -300,6 +310,42 @@ class VacaApiViewModel(context: Context) : ViewModel() {
                 e.printStackTrace()
             }
         }
+    }
+    /**
+     * DELETE /vacas/{id} (eliminar)
+     */
+    fun eliminarVaca(id: String) {
+        viewModelScope.launch {
+            try {
+                _isDeleting.value = true
+                _deleteSucces.value = false
+                _deleteError.value = null
+
+                val response = repository.eliminarVaca(id)
+
+                _isDeleting.value = false
+
+                if(response == null){
+                    _deleteSucces.value = true
+                    obtenerVacasActivas()
+                } else {
+                    _deleteError.value = "Error al eliminar la vaca"
+                }
+
+            } catch (e: Exception){
+                _isDeleting.value = false
+                _deleteError.value = "Error: ${e.message}"
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
+     * Resetea los estados de eliminación
+     */
+    fun resetDeleteStates() {
+        _deleteSucces.value = false
+        _deleteError.value = null
     }
 
     /**

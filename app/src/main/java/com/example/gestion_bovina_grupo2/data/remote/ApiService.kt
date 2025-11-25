@@ -9,6 +9,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import com.example.gestion_bovina_grupo2.data.model.VacaRequest
 import com.example.gestion_bovina_grupo2.data.model.VacaResponse
+import retrofit2.http.DELETE
 import retrofit2.http.PATCH
 import retrofit2.http.Path
 
@@ -64,6 +65,18 @@ interface ApiService {
         @Path("id") id: String,
         @Header("Authorization") authorization: String,
         @Body vacaRequest: VacaRequest
+    ): VacaResponse
+
+    /**
+     * ELIMINAR VACA
+     * DELETE /vacas
+     * @param id de la vaca
+     * @return Json con datos de la vaca eliminada
+     */
+    @DELETE("vacas/{id}")
+    suspend fun deleteVaca(
+        @Path("id") id: String,
+        @Header("Authorization") authorization: String
     ): VacaResponse
 
 }

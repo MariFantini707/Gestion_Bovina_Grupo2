@@ -135,4 +135,32 @@ class VacaRepository(private val context: Context) {
             null
         }
     }
+
+    /**
+     * Eliminar una vaca
+     * DELETE /vacas
+     * @Param id ID de la vaca a eliminar
+     * @return VacaResponse si es exitoso, null si hay error
+     */
+    suspend fun eliminarVaca(id: String): VacaResponse? {
+        return try {
+            val token = obtenerToken()
+            if (token == null) {
+                println(" No hay token disponible")
+                return null
+            }
+            println(" Haciendo petición DELETE a /vacas/$id...")
+            val response = RetrofitInstance.api.deleteVaca(
+                id = id,
+                authorization = "Bearer $token"
+            )
+            println(" Delete Vaca exitoso! ID: ${response.id}")
+            response
+        } catch (e: Exception){
+            println("❌ Error en Repository.eliminarVaca(): ${e.message}")
+            e.printStackTrace()
+            null
+        }
+    }
+
 }
