@@ -76,4 +76,12 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     // Corrutinas para trabajo asincrónico
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+
+    //implementacion del permiso de camara
+    implementation("com.google.accompanist-permissions:0.28.0")
+    val camerax_version = "1.5.1"
+    implementation("androidx.camera:camera-camera2:1.5.1")
+    implementation("androidx.camera:camera-lifecycle:1.5.1")
+    implementation("androidx.camera:camera-view:1.5.1")
+
 }
