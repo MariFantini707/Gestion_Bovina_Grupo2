@@ -70,6 +70,7 @@ fun FormularioVacaScreen(
         )
     }
     //CAMARA
+
     fun crearArchivoTemporal(): File {
         val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
@@ -90,6 +91,8 @@ fun FormularioVacaScreen(
     }
 
 // CÁMARA REAL
+
+
     val launcherCamara = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -337,10 +340,25 @@ fun FormularioVacaScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             //COMIENZO DE LA CAMARA
+
+            val permisoCamara = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { granted ->
+                if (granted) {
+                    val archivo = crearArchivoTemporal()
+                    uriTemporal = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.provider",
+                        archivo
+                    )
+                    launcherCamara.launch(uriTemporal!!)
+                }
+            }
+
             Text(
-                "Fotografía de la vaca (opcional)",
+                "Ingrese fotografía de la vaca (opcional)",
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 13.sp
             )
 
             Row(
@@ -359,13 +377,7 @@ fun FormularioVacaScreen(
 
                 Button(
                     onClick = {
-                        val archivo = crearArchivoTemporal()
-                        uriTemporal = FileProvider.getUriForFile(
-                            context,
-                            "${context.packageName}.provider",
-                            archivo
-                        )
-                        launcherCamara.launch(uriTemporal!!)
+                        permisoCamara.launch(Manifest.permission.CAMERA)
                     },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -386,7 +398,7 @@ fun FormularioVacaScreen(
                         .clip(RoundedCornerShape(12.dp))
                 )
             }
-
+            Spacer(Modifier.height(12.dp))
             //FIN DE LA CAMARA
 
             // ========== BOTÓN CREAR/EDITAR ==========
