@@ -1,5 +1,7 @@
 package com.example.gestion_bovina_grupo2.ui.theme.screens
 
+import android.Manifest
+import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,16 +24,82 @@ import com.example.gestion_bovina_grupo2.data.model.VacaRequest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.util.Log
+import androidx.annotation.RequiresApi
+//pruebas
+import android.os.Environment
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import java.io.File
+import androidx.core.content.FileProvider
+import android.net.Uri
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.foundation.Image
+import androidx.compose.ui.draw.clip
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun FormularioVacaScreen(
     navController: NavController,
-    vacaParaEditar: VacaApi? = null  // ← null = CREAR, con datos = EDITAR
+    vacaParaEditar: VacaApi? = null,  // ← null = CREAR, con datos = EDITAR
+
 ) {
     val context = LocalContext.current
+    val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        val vibratorManager = context.getSystemService(VibratorManager::class.java)
+        vibratorManager?.defaultVibrator
+    } else {
+        context.getSystemService(Vibrator::class.java)
+    }
+
+
+    // vibración
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun vibrarError() {
+        Log.d("VIBRATION", "Vibración ejecutada")
+        vibrator?.vibrate(
+            VibrationEffect.createOneShot(
+                120, // duración ms
+                VibrationEffect.DEFAULT_AMPLITUDE
+            )
+        )
+    }
+    //CAMARA
+    fun crearArchivoTemporal(): File {
+        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "vaca_${System.currentTimeMillis()}",
+            ".jpg",
+            storageDir
+        )
+    }
+    var fotoUri by remember { mutableStateOf<Uri?>(null) }
+    var uriTemporal by remember { mutableStateOf<Uri?>(null) }
+
+    val launcherGaleria = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            fotoUri = uri
+        }
+    }
+
+// CÁMARA REAL
+    val launcherCamara = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) fotoUri = uriTemporal
+    }
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+
 
     // ========== ViewModel ==========
     val viewModel = remember { VacaApiViewModel(context) }
@@ -134,6 +202,7 @@ fun FormularioVacaScreen(
     )
     fun generoDisplay(code: String): String =
         generoOptions.firstOrNull { it.first == code }?.second ?: ""
+
 
     Scaffold(
         topBar = {
@@ -267,11 +336,65 @@ fun FormularioVacaScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            //COMIENZO DE LA CAMARA
+            Text(
+                "Fotografía de la vaca (opcional)",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Button(
+                    onClick = {
+                        launcherGaleria.launch("image/*")
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Galería")
+                }
+
+                Button(
+                    onClick = {
+                        val archivo = crearArchivoTemporal()
+                        uriTemporal = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.provider",
+                            archivo
+                        )
+                        launcherCamara.launch(uriTemporal!!)
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cámara")
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // Vista previa de la imagen seleccionada
+            fotoUri?.let { uri ->
+                Image(
+                    painter = rememberAsyncImagePainter(uri),
+                    contentDescription = "Foto vaca",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
+
+            //FIN DE LA CAMARA
+
             // ========== BOTÓN CREAR/EDITAR ==========
             Button(
                 onClick = {
                     // Validar fecha
                     if (fechaSeleccionada == null) {
+                        vibrarError()
                         scope.launch {
                             snackbarHostState.showSnackbar("❌ Por favor selecciona una fecha")
                         }
@@ -280,6 +403,7 @@ fun FormularioVacaScreen(
 
                     // Validar formulario
                     if (!viewModel.validarFormulario()) {
+                        vibrarError()
                         scope.launch {
                             snackbarHostState.showSnackbar("❌ Por favor completa todos los campos")
                         }
