@@ -86,8 +86,24 @@ dependencies {
     implementation("androidx.camera:camera-view:${camerax_version}")
     implementation("androidx.camera:camera-mlkit-vision:${camerax_version}")
     implementation("androidx.camera:camera-extensions:${camerax_version}")
-
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+    //kotest
+    testImplementation("io.kotest:kotest-runner-junit5:6.0.5")
+    testImplementation("io.kotest:kotest-assertions-core:6.0.5")
 
+    //JUnit5
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
+
+    //Mockk
+    testImplementation("io.mockk:mockk:1.14.6")
+
+    //Compose UI test
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.9.5")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.9.5")
+
+    //obligatorio para JUnit
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
 }
