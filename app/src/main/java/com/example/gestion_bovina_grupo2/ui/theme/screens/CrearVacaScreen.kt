@@ -40,6 +40,9 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.Image
 import androidx.compose.ui.draw.clip
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -224,9 +227,11 @@ fun FormularioVacaScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
+        val DarkGreen = Color(0xFF005500)
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -370,7 +375,11 @@ fun FormularioVacaScreen(
                     onClick = {
                         launcherGaleria.launch("image/*")
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DarkGreen,
+                        contentColor = Color.White
+                    )
                 ) {
                     Text("Galería")
                 }
@@ -379,7 +388,11 @@ fun FormularioVacaScreen(
                     onClick = {
                         permisoCamara.launch(Manifest.permission.CAMERA)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DarkGreen,
+                        contentColor = Color.White
+                    )
                 ) {
                     Text("Cámara")
                 }
