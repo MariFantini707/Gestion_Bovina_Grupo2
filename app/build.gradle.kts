@@ -102,6 +102,9 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.9.5")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.9.5")
 
+    //coroutines test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+
     //obligatorio para JUnit
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
