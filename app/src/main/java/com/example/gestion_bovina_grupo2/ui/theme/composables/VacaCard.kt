@@ -26,6 +26,7 @@ import com.example.gestion_bovina_grupo2.data.model.getGeneroLegible
  * @param onEditClick Callback cuando se presiona Editar
  * @param onDeleteClick Callback cuando se confirma Eliminar
  */
+
 @Composable
 fun VacaCard(
     vaca: VacaApi,

@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.window.size.class1)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -91,8 +92,8 @@ dependencies {
 
 
     //Compose UI test
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.6.2")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.2")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.7.5")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.5")
 
     // JUnit 4 (Legacy, a veces necesario para reglas de Android)
     testImplementation(libs.junit)
@@ -113,21 +114,37 @@ dependencies {
     // Debe coincidir con la versión de arriba (1.8.0)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
 
-    // Android Instrumentados (UI Tests)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+// ==========================================
+    // UI TESTING (Carpeta androidTest - JUnit 4)
+    // ==========================================
+
+    // ---> AQUÍ ESTÁ LA SOLUCIÓN DEL ERROR <---
+    // Forzamos versiones específicas compatibles con Compose UI Test
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Compose BOM y Reglas de Test
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.6.2")
 
-    // Debug
+    // DEBUG (Necesario para ver el árbol de componentes en tests)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.2")
+
+
 
 }
 
 //obligatorio para JUnit
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+configurations.all {
+    resolutionStrategy {
+        // Forzamos a Gradle a usar estas versiones específicas,
+        // ignorando si otras librerías piden versiones más nuevas.
+        force("androidx.test.ext:junit:1.1.5")
+        force("androidx.test.espresso:espresso-core:3.5.1")
+    }
 }
