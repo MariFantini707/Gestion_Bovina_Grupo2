@@ -15,6 +15,7 @@ class VacaViewModel(
 
     // Contadores (persistentes)
     private val _totalVacas = MutableStateFlow(0)
+    val totalVacas: StateFlow<Int> = _totalVacas
 
     private val _registradasHoy = MutableStateFlow(0)
     val registradasHoy: StateFlow<Int> = _registradasHoy
