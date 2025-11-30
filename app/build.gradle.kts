@@ -88,25 +88,46 @@ dependencies {
     implementation("androidx.camera:camera-extensions:${camerax_version}")
     implementation("io.coil-kt:coil-compose:2.7.0")
 
-    //kotest
-    testImplementation("io.kotest:kotest-runner-junit5:6.0.5")
-    testImplementation("io.kotest:kotest-assertions-core:6.0.5")
 
-    //JUnit5
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
-
-    //Mockk
-    testImplementation("io.mockk:mockk:1.14.6")
 
     //Compose UI test
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.9.5")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.9.5")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.6.2")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.2")
 
-    //coroutines test
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    // JUnit 4 (Legacy, a veces necesario para reglas de Android)
+    testImplementation(libs.junit)
 
-    //obligatorio para JUnit
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-    }
+    // JUnit 5 (Jupiter)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+
+    // MockK
+    testImplementation("io.mockk:mockk:1.13.10")
+
+    // Kotest (Opcional si usas MockK y JUnit5 standard, pero lo dejo si lo usas)
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+
+    // --- CORRUTINAS TEST (AQUÍ ESTABA EL ERROR) ---
+    // Debe coincidir con la versión de arriba (1.8.0)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
+    // Android Instrumentados (UI Tests)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.6.2")
+
+    // Debug
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.2")
+
+}
+
+//obligatorio para JUnit
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }

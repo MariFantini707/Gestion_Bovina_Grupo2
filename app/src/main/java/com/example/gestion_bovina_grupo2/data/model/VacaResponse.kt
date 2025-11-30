@@ -15,3 +15,5 @@ data class VacaResponse(
     @SerializedName("__v")
     val version: Int
 )
+
+

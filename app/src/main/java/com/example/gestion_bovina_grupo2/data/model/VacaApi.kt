@@ -23,3 +23,5 @@ fun VacaApi.getGeneroLegible() = when(genre) {
     "M" -> "Macho"
     else -> "Desconocido"
 }
+
+
