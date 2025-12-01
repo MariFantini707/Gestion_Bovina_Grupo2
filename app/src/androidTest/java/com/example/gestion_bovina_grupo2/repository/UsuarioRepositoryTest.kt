@@ -16,7 +16,7 @@ class UsuarioRepositoryTest {
     private lateinit var tokenDataStore: TokenDataStore
 
     @Before
-    fun setup() = runTest {  // ✅ CAMBIO: runTest
+    fun setup() = runTest {  // runTest
         // Inicializamos DataStore
         tokenDataStore = TokenDataStore(context)
 
@@ -28,7 +28,7 @@ class UsuarioRepositoryTest {
     }
 
     @Test
-    fun obtenerToken_retorna_null_si_esta_vacio() = runTest {  // ✅ CAMBIO: runTest y suspend
+    fun obtenerToken_retorna_null_si_esta_vacio() = runTest {  // runTest y suspend
         // Al inicio no hay nada, debería ser null
         val token = repository.obtenerToken()
 
@@ -36,7 +36,7 @@ class UsuarioRepositoryTest {
     }
 
     @Test
-    fun obtenerToken_retorna_el_valor_correcto_si_ya_existe_sesion() = runTest {  // ✅ CAMBIO: runTest
+    fun obtenerToken_retorna_el_valor_correcto_si_ya_existe_sesion() = runTest {  // runTest
         // SIMULAMOS UN LOGIN EXITOSO
         // Guardamos un token directamente en DataStore
         tokenDataStore.guardarToken("TOKEN_DE_PRUEBA_123")
@@ -49,7 +49,7 @@ class UsuarioRepositoryTest {
     }
 
     @Test
-    fun cerrarSesion_borra_el_token() = runTest {  // ✅ CAMBIO: runTest
+    fun cerrarSesion_borra_el_token() = runTest {  // runTest
         // Primero guardamos un token (simulando usuario logueado)
         tokenDataStore.guardarToken("TOKEN_A_BORRAR")
 
