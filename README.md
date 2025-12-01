@@ -128,7 +128,7 @@ Ejemplo de como se observa en drive:
 
 
 
-### 📸 Proceso de Instalación en Dispositivo
+### 7. Proceso de Instalación en Dispositivo
 
 A continuación se muestra cómo se visualiza el proceso de instalación manual del archivo **APK** en un dispositivo Android físico.
 
@@ -158,7 +158,7 @@ A continuación se muestra cómo se visualiza el proceso de instalación manual 
 > **Nota sobre seguridad:** Al ser una aplicación instalada manualmente (Sideloading) y no descargada desde Google Play Store, es posible que el dispositivo solicite permisos para **"Instalar aplicaciones de fuentes desconocidas"** o muestre una advertencia de **Google Play Protect**. Esto es un comportamiento estándar de seguridad en Android.
 
 
-### 🛠️ Tecnologías y Librerías
+### 8. Tecnologías y Librerías
 
 Este proyecto fue desarrollado utilizando un stack tecnológico moderno nativo para Android, integrando herramientas de vanguardia:
 
