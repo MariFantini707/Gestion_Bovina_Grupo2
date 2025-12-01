@@ -1,15 +1,15 @@
 # Gestión bovina
 
-## Descripción
+## 1. Descripción
 Este proyecto consiste en el desarrollo de una aplicación móvil nativa creada en Android Studio, utilizando el lenguaje de programación Kotlin y el toolkit moderno de interfaz Jetpack Compose, todo estructurado bajo el patrón de arquitectura de software MVVM (Model-View-ViewModel). El propósito principal del sistema es implementar una gestión digital integral para el ganado bovino, permitiendo registrar y realizar conteos de animales en estricto cumplimiento con las normativas del Servicio Agrícola y Ganadero (SAG), optimizando así la trazabilidad y el control en el campo.
 
 El sistema ofrece una experiencia completa que permite a los usuarios gestionar el inventario ganadero, conectándose a un Backend propio en Node.js con MongoDB Atlas para la persistencia en la nube y utilizando DataStore para datos locales. Además de la captura fotográfica con la cámara, se ha integrado el recurso nativo de vibración (respuesta háptica) como mecanismo de alerta; esta función se activa automáticamente en el formulario de registro bovino cuando el sistema detecta un llenado incorrecto o campos faltantes, proporcionando una retroalimentación física inmediata al usuario para corregir el error.
 
-## Estudiantes
+## 2. Estudiantes
 - Oscar Abud Palma
 - María Victoria Fantini
 
-## Funcionalidades Implementadas
+## 3. Funcionalidades Implementadas
 
 - **Funcionalidad 1: Registro de Vacas con Soporte Multimedia y Háptico:** Permite registrar una vaca ingresando todas sus características obligatorias (DIIO, raza, edad, estado, etc.) en cumplimiento con la normativa del Servicio Agrícola y Ganadero (SAG). Este módulo integra el uso de la cámara nativa para capturar y adjuntar evidencia fotográfica del animal, e incorpora respuesta háptica (vibración) para alertar físicamente al usuario en caso de errores de validación durante el llenado del formulario.
   
