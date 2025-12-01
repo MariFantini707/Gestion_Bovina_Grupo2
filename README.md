@@ -46,6 +46,13 @@ La aplicación móvil consume una API REST propia (Backend Node.js) para la pers
 
 Para el correcto funcionamiento del sistema, es necesario levantar primero el servidor (Backend) y posteriormente la aplicación móvil.
 
+Puedes descargar o clonar el backend de la aplicación en el siguiente link de github: 
+
+```bash
+https://github.com/oscar-abud/api-gestion-bovina.git
+```
+
+
 #### Parte A: Backend (API Microservicio)
 
 1.  Abrir la carpeta del proyecto backend en **Visual Studio Code**.
