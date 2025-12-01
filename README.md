@@ -23,6 +23,23 @@ El sistema ofrece una experiencia completa que permite a los usuarios gestionar 
 - **Funcionalidad 4: Edición y Control de Bajas (Ciclo de Vida):** Permite la gestión completa del registro animal, habilitando la actualización (Update) de los datos de cualquier vaca en caso de errores o cambios en sus características. Además, incorpora la funcionalidad de desactivación (Soft Delete) para dar de baja animales del sistema activo en situaciones críticas (como venta, enfermedad o deceso), manteniendo la integridad histórica de los datos.
 
 
+### 4. Endpoints Utilizados
+
+La aplicación móvil consume una API REST propia (Backend Node.js) para la persistencia y gestión de datos. A continuación se detallan los endpoints utilizados por cada módulo de la aplicación:
+
+| Pantalla / Funcionalidad | Método | Endpoint | Descripción |
+| :--- | :---: | :--- | :--- |
+| **Inicio de Sesión** | `POST` | `/api/auth/login` | Verifica las credenciales del usuario y retorna un Token de sesión. |
+| **Home (Dashboard)** | `GET` | `/api/vacas` | Obtiene el listado completo de vacas activas para calcular métricas y mostrarlas. |
+| **Vacas Desactivadas** | `GET` | `/api/vacas/desactivadas` | Obtiene el historial de vacas que han sido dadas de baja del sistema. |
+| **Registrar Vaca** | `POST` | `/api/vacas` | Envía los datos del formulario (incluyendo DIIO y foto) para crear un nuevo registro. |
+| **Editar Vaca** | `PATCH` | `/api/vacas/:id` | Actualiza la información de una vaca específica identificada por su ID único. |
+| **Eliminar Vaca** | `DELETE` | `/api/vacas/:id` | Realiza una eliminación lógica (cambio de estado) del registro en la base de datos. |
+
+> **Nota:** El parámetro `:id` corresponde al **DIIO**, el cual funciona como el identificador único del animal en la base de datos MongoDB.
+>
+> 
+
 ## Pasos para Ejecutar el Proyecto
   
 ### 5. Pasos para Ejecutar
