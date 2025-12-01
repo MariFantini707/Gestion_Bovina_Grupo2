@@ -1,40 +1,65 @@
 # Gestión bovina
 
 ## Descripción
-Este proyecto consiste en el desarrollo de una aplicación móvil creada en Android Studio utilizando el lenguaje Kotlin, con el propósito de implementar un sistema de gestión bovino digital. El sistema está diseñado para registrar a cada bovino y realizar conteos, cumpliendo estrictamente con las normativas del Servicio Agrícola y Ganadero (SAG). 
-A través de esta aplicación, se busca optimizar y agilizar el proceso de registro y seguimiento de los animales.
+Este proyecto consiste en el desarrollo de una aplicación móvil nativa creada en Android Studio, utilizando el lenguaje de programación Kotlin y el toolkit moderno de interfaz Jetpack Compose, todo estructurado bajo el patrón de arquitectura de software MVVM (Model-View-ViewModel). El propósito principal del sistema es implementar una gestión digital integral para el ganado bovino, permitiendo registrar y realizar conteos de animales en estricto cumplimiento con las normativas del Servicio Agrícola y Ganadero (SAG), optimizando así la trazabilidad y el control en el campo.
+
+El sistema ofrece una experiencia completa que permite a los usuarios gestionar el inventario ganadero, conectándose a un Backend propio en Node.js con MongoDB Atlas para la persistencia en la nube y utilizando DataStore para datos locales. Además de la captura fotográfica con la cámara, se ha integrado el recurso nativo de vibración (respuesta háptica) como mecanismo de alerta; esta función se activa automáticamente en el formulario de registro bovino cuando el sistema detecta un llenado incorrecto o campos faltantes, proporcionando una retroalimentación física inmediata al usuario para corregir el error.
 
 ## Estudiantes
 - Oscar Abud Palma
 - María Victoria Fantini
 
 ## Funcionalidades Implementadas
-- **Funcionalidad 1: Registro de Vacas**: Permite registrar una vaca con todas sus características obligatorias, según lo exigido por la normativa del Servicio Agrícola y Ganadero (SAG). Las características incluyen información como el número de identificación, raza, edad, estado de salud, entre otras, todas necesarias para cumplir con las regulaciones locales. 
-- **Funcionalidad 2: Contador de Vacas Registradas**: Muestra un contador con la cantidad total de vacas registradas históricamente en el sistema. En paralelo, presenta un contador de vacas registradas en la fecha en que se realiza el registro, permitiendo a los usuarios visualizar las vacas registradas en el día en tiempo real.
+
+- **Funcionalidad 1: Registro de Vacas con Soporte Multimedia y Háptico:** Permite registrar una vaca ingresando todas sus características obligatorias (DIIO, raza, edad, estado, etc.) en cumplimiento con la normativa del Servicio Agrícola y Ganadero (SAG). Este módulo integra el uso de la cámara nativa para capturar y adjuntar evidencia fotográfica del animal, e incorpora respuesta háptica (vibración) para alertar físicamente al usuario en caso de errores de validación durante el llenado del formulario.
+  
+
+- **Funcionalidad 2: Dashboard de Métricas y Contadores:** Presenta un panel visual con indicadores en tiempo real que incluye un contador histórico del total de vacas en el sistema y un contador diario específico para las vacas registradas durante la jornada actual, facilitando el control rápido del flujo de trabajo (dispuesta a cambios).
+  
+
+- **Funcionalidad 3: Gestión de Inventario y Filtrado por Estado:** Ofrece una vista detallada del listado de vacas registradas, permitiendo al usuario visualizar la información clave de cada animal. Incluye un sistema de filtrado inteligente para alternar la vista entre vacas "Activas" (presentes en el predio) y "Desactivadas" (historial de bajas), facilitando la búsqueda y organización.
+  
+
+- **Funcionalidad 4: Edición y Control de Bajas (Ciclo de Vida):** Permite la gestión completa del registro animal, habilitando la actualización (Update) de los datos de cualquier vaca en caso de errores o cambios en sus características. Además, incorpora la funcionalidad de desactivación (Soft Delete) para dar de baja animales del sistema activo en situaciones críticas (como venta, enfermedad o deceso), manteniendo la integridad histórica de los datos.
 
 
 ## Pasos para Ejecutar el Proyecto
   
-    1. Abrir la aplicación Android Studio.
-   
-    2. Presionar en la sección superior izquierda el nombre de la app que está por predeterminado.
-   
-    3. Seleccionar la opción "Clone repository..."
-   
-    4. En la sección donde está escrito "URL" se debe colocar el link que se encuentra al final de la instrucción.
+### 5. Pasos para Ejecutar
 
-    5. Presionar "Clone" para que el archivo sea clonado correctamente.
-    
-    6. Sincronizar las dependencias de la app para que no existan errores (aparecerá en la parte superior de arriba una notificación recomendando realizar un "Sync project with gradle files".
+Para el correcto funcionamiento del sistema, es necesario levantar primero el servidor (Backend) y posteriormente la aplicación móvil.
 
-    7. Ir al apartado de "Device manager" y luego seleccionar la API 36.1
+#### Parte A: Backend (API Microservicio)
 
-    8. Una vez que se visualice la pantalla, debe presionar el logo de encendido/apagado.
+1.  Abrir la carpeta del proyecto backend en **Visual Studio Code**.
+2.  Abrir una nueva terminal en el editor.
+3.  Instalar las dependencias del proyecto ejecutando el siguiente comando:
+    ```bash
+    npm install
+    ```
+4.  Iniciar el servidor ejecutando:
+    ```bash
+    npm start
+    ```
+    > **Nota:** Verifique en la consola que aparezca el mensaje de "Conexión exitosa a la base de datos" y que el servidor esté corriendo.
 
-    9. Por último debe ejecutar la app en MainActivity (el logo de inicio en la parte superior).
-    
-## URL para el paso 4.
-   ```bash
-   https://github.com/MariFantini707/Gestion_Bovina_Grupo2.git
+#### Parte B: Aplicación Móvil (Android Studio)
+
+1.  Abrir la aplicación **Android Studio**.
+2.  Presionar en la sección superior izquierda el nombre de la app (o proyecto) que está abierto por defecto.
+3.  Seleccionar la opción **"Clone repository..."**.
+4.  En la sección donde está escrito "URL", colocar el siguiente enlace:
+    ```text
+    [https://github.com/MariFantini707/Gestion_Bovina_Grupo2.git](https://github.com/MariFantini707/Gestion_Bovina_Grupo2.git)
+    ```
+5.  Presionar **"Clone"** para que el archivo sea clonado correctamente.
+6.  Sincronizar las dependencias de la app para que no existan errores.
+    * *Nota: Aparecerá una notificación en la parte superior recomendando realizar un "Sync project with gradle files" o un botón "Sync Now". Presiónelo.*
+7.  Ir al apartado de **"Device Manager"**.
+8.  **IMPORTANTE - Configuración del Emulador:**
+    * Seleccionar o crear un emulador con **API 34** o **API 35**.
+    * **Advertencia:** No utilizar la API 36, ya que puede generar conflictos con las pruebas.
+9.  Una vez que se visualice la pantalla del emulador, presionar el botón de encendido (**Play**).
+10. Por último, ejecutar la app presionando el botón **"Run 'app'"** (triángulo verde) asegurándose de estar en `MainActivity`.
    
   
