@@ -12,7 +12,7 @@ object RetrofitInstance {
     // IMPORTANTE: Cambiar URL segun maquina de despliegue
     // Para EMULADOR de Android Studio: usa "10.0.2.2"
     // Para DISPOSITIVO FÍSICO: usa tu IP local (ej: "192.168.1.110")
-    private const val BASE_URL = "http://10.0.2.2:3000/"
+    private const val BASE_URL = "https://api-gestion-bovina.onrender.com"
 
     /**
      * Se instancia el servicio de la API una sola vez

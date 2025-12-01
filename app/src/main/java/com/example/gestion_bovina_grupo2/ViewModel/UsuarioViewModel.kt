@@ -24,6 +24,20 @@ class UsuarioViewModel(context: Context) : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    // Estado de autenticación
+    private val _isAuthenticated = MutableStateFlow(false)
+    val isAuthenticated: StateFlow<Boolean> = _isAuthenticated
+
+    // Verificar sesión al iniciar
+    init {
+        viewModelScope.launch {
+            val token = repository.obtenerToken()
+            _isAuthenticated.value = !token.isNullOrEmpty()
+            println("INIT - Token encontrado: ${token?.take(20) ?: "NO HAY TOKEN"}")
+            println("INIT - isAuthenticated: ${_isAuthenticated.value}")
+        }
+    }
+
     // ========== FUNCIONES PARA ACTUALIZAR CAMPOS ==========
 
     fun onEmailChange(valor: String) {
@@ -87,6 +101,7 @@ class UsuarioViewModel(context: Context) : ViewModel() {
                 if (token != null) {
                     // Login exitoso
                     println("✅ Login exitoso. Token: $token")
+                    _isAuthenticated.value = true
                     limpiarFormulario()
                     onSuccess()
                 } else {
@@ -122,13 +137,11 @@ class UsuarioViewModel(context: Context) : ViewModel() {
      * y resetea el formulario
      */
     fun logout() {
-        // Limpiar token del repositorio (SharedPreferences)
-        repository.cerrarSesion()
-
-        // Limpiar formulario
-        limpiarFormulario()
-
-        println("🚪 Sesión cerrada. Token eliminado.")
+        viewModelScope.launch {
+            repository.cerrarSesion()
+            _isAuthenticated.value = false
+            limpiarFormulario()
+        }
     }
 
     /**

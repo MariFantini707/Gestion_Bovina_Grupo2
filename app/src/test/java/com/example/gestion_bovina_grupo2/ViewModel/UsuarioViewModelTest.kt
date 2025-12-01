@@ -1,8 +1,6 @@
 package com.example.gestion_bovina_grupo2.ViewModel
 
 import android.content.Context
-import com.example.gestion_bovina_grupo2.model.Usuario
-import com.example.gestion_bovina_grupo2.model.UsuarioErrores
 import com.example.gestion_bovina_grupo2.repository.UsuarioRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -23,18 +21,24 @@ class UsuarioViewModelTest {
     private lateinit var viewModel: UsuarioViewModel
 
     @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
+    fun setup() = runTest {
+        MockKAnnotations.init(this@UsuarioViewModelTest)
         Dispatchers.setMain(dispatcher)
 
         // Interceptamos el constructor del repositorio
         mockkConstructor(UsuarioRepository::class)
 
-        // Configuramos comportamientos por defecto para evitar NullPointerExceptions
+        // Mock para obtenerToken (usado en el init)
+        coEvery { anyConstructed<UsuarioRepository>().obtenerToken() } returns null
+
+        // Configuramos comportamientos por defecto
         coEvery { anyConstructed<UsuarioRepository>().login(any(), any()) } returns "fake_token_123"
-        every { anyConstructed<UsuarioRepository>().cerrarSesion() } just Runs
+        coEvery { anyConstructed<UsuarioRepository>().cerrarSesion() } just Runs  // ✅ CAMBIO: coEvery
 
         viewModel = UsuarioViewModel(context)
+
+        // Esperar a que el init termine
+        advanceUntilIdle()
     }
 
     @AfterEach
@@ -44,17 +48,34 @@ class UsuarioViewModelTest {
     }
 
     // ===========================================================
+    // NUEVO - TEST DE AUTENTICACIÓN INICIAL
+    // ===========================================================
+
+    @Test
+    fun `init verifica token y establece isAuthenticated correctamente - sin token`() = runTest {
+        // El token es null (configurado en setup)
+        assertFalse(viewModel.isAuthenticated.value)
+    }
+
+    @Test
+    fun `init verifica token y establece isAuthenticated correctamente - con token`() = runTest {
+        // Mock: hay un token guardado
+        coEvery { anyConstructed<UsuarioRepository>().obtenerToken() } returns "token_guardado"
+
+        val viewModelConToken = UsuarioViewModel(context)
+        advanceUntilIdle()
+
+        assertTrue(viewModelConToken.isAuthenticated.value)
+    }
+
+    // ===========================================================
     // ACTUALIZACIÓN DE CAMPOS
     // ===========================================================
 
     @Test
     fun `onEmailChange actualiza el email y limpia errores`() {
-        // Simulamos escribir en el campo email
         viewModel.onEmailChange("test@correo.com")
-
-        // Verificamos que el estado cambió
         assertEquals("test@correo.com", viewModel.estado.value.email)
-        // Verificamos que el error de email se limpió (es null)
         assertNull(viewModel.estado.value.errores.email)
     }
 
@@ -70,22 +91,15 @@ class UsuarioViewModelTest {
 
     @Test
     fun `validarYLogin muestra errores si los campos están vacios`() = runTest {
-        // Como el Usuario por defecto tiene strings vacíos (""), no necesitamos setear nada
-
         var successLlamado = false
 
-        // Ejecutamos validación
         viewModel.validarYLogin(onSuccess = { successLlamado = true })
         advanceUntilIdle()
 
-        // Verificamos que NO tuvo éxito
         assertFalse(successLlamado)
-
-        // Verificamos los mensajes de error exactos definidos en tu ViewModel
         assertEquals("El correo es obligatorio", viewModel.estado.value.errores.email)
         assertEquals("La contraseña es obligatoria", viewModel.estado.value.errores.password)
 
-        // Verificamos que NO se llamó al repositorio (ahorro de recursos)
         coVerify(exactly = 0) { anyConstructed<UsuarioRepository>().login(any(), any()) }
     }
 
@@ -95,27 +109,24 @@ class UsuarioViewModelTest {
 
     @Test
     fun `validarYLogin funciona correctamente (Login Exitoso)`() = runTest {
-        // 1. Llenamos el formulario con datos válidos
         viewModel.onEmailChange("usuario@test.com")
         viewModel.onPasswordChange("123456")
 
-        // 2. Mock: El repositorio devuelve un token válido
         coEvery {
             anyConstructed<UsuarioRepository>().login("usuario@test.com", "123456")
         } returns "token_valido_abc"
 
         var successLlamado = false
 
-        // 3. Ejecutamos
         viewModel.validarYLogin(onSuccess = { successLlamado = true })
         advanceUntilIdle()
 
-        // 4. Verificaciones
         assertTrue(successLlamado, "El callback onSuccess debería haberse ejecutado")
-        assertFalse(viewModel.isLoading.value) // La carga debe haber terminado
+        assertFalse(viewModel.isLoading.value)
 
-        // Al tener éxito, tu ViewModel llama a limpiarFormulario(),
-        // así que el email debería volver a estar vacío.
+        // Verificar que isAuthenticated cambió a true
+        assertTrue(viewModel.isAuthenticated.value)
+
         assertEquals("", viewModel.estado.value.email)
         assertEquals("", viewModel.estado.value.password)
     }
@@ -125,7 +136,6 @@ class UsuarioViewModelTest {
         viewModel.onEmailChange("fail@test.com")
         viewModel.onPasswordChange("wrong_pass")
 
-        // Mock: El repositorio devuelve null (login fallido)
         coEvery {
             anyConstructed<UsuarioRepository>().login(any(), any())
         } returns null
@@ -134,10 +144,11 @@ class UsuarioViewModelTest {
         viewModel.validarYLogin(onSuccess = { successLlamado = true })
         advanceUntilIdle()
 
-        // Verificamos que falló
         assertFalse(successLlamado)
-        // Verificamos el mensaje de error general
         assertEquals("Correo o contraseña incorrectos", viewModel.estado.value.errores.loginGeneral)
+
+        // isAuthenticated debe seguir en false
+        assertFalse(viewModel.isAuthenticated.value)
     }
 
     @Test
@@ -145,7 +156,6 @@ class UsuarioViewModelTest {
         viewModel.onEmailChange("error@test.com")
         viewModel.onPasswordChange("123")
 
-        // Mock: El repositorio lanza una excepción
         coEvery {
             anyConstructed<UsuarioRepository>().login(any(), any())
         } throws Exception("Error 500")
@@ -162,20 +172,47 @@ class UsuarioViewModelTest {
     // ===========================================================
 
     @Test
-    fun `logout cierra sesion y limpia formulario`() {
-        // Llenamos el formulario para ver si se limpia
+    fun `logout cierra sesion y limpia formulario`() = runTest {  // ✅ CAMBIO: runTest
+        // Primero simulamos que está autenticado
         viewModel.onEmailChange("usuario@mail.com")
 
         viewModel.logout()
+        advanceUntilIdle()  // Esperar que termine la coroutine
 
-        // Verifica que se llamó a cerrar sesión en el repo
-        verify(exactly = 1) { anyConstructed<UsuarioRepository>().cerrarSesion() }
+        // ✅ CAMBIO: coVerify en lugar de verify
+        coVerify(exactly = 1) { anyConstructed<UsuarioRepository>().cerrarSesion() }
 
-        // Verifica que el formulario volvió a estar vacío
+        // Verificar que isAuthenticated cambió a false
+        assertFalse(viewModel.isAuthenticated.value)
+
         assertEquals("", viewModel.estado.value.email)
-
-        // Verificación extra: como Usuario() tiene valores por defecto,
-        // el rut también debería ser "" aunque no lo hayamos tocado.
         assertEquals("", viewModel.estado.value.rut)
+    }
+
+    // ===========================================================
+    // NUEVO - TEST DE PERSISTENCIA
+    // ===========================================================
+
+    @Test
+    fun `login exitoso actualiza isAuthenticated a true`() = runTest {
+        viewModel.onEmailChange("user@test.com")
+        viewModel.onPasswordChange("pass123")
+
+        coEvery {
+            anyConstructed<UsuarioRepository>().login(any(), any())
+        } returns "token_abc"
+
+        viewModel.validarYLogin(onSuccess = {})
+        advanceUntilIdle()
+
+        assertTrue(viewModel.isAuthenticated.value)
+    }
+
+    @Test
+    fun `logout actualiza isAuthenticated a false`() = runTest {
+        viewModel.logout()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.isAuthenticated.value)
     }
 }

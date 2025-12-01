@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,22 +35,22 @@ fun AppNavigation() {
         UsuarioViewModel(context)
     }
 
-    // Repositorio de DataStore para contadores (tu código existente)
+    // ✅ NUEVO - Observar estado de autenticación
+    val isAuthenticated by usuarioViewModel.isAuthenticated.collectAsState()
+
+    // Repositorio de DataStore para contadores
     val contadorRepo = remember { ContadorRepository(context) }
 
-    // VacaViewModel compartido en el grafo (tu código existente)
+    // VacaViewModel compartido en el grafo
     val vacaViewModel: VacaViewModel = viewModel(
         factory = VacaViewModel.provideFactory(contadorRepo)
     )
 
     // ========== FUNCIÓN DE LOGOUT ==========
     val handleLogout: () -> Unit = {
-        // Limpiar el token usando el ViewModel
         usuarioViewModel.logout()
-
-        // Navegar al login y limpiar el back stack
         navController.navigate("login") {
-            popUpTo(0) { inclusive = true } // Limpia toda la pila de navegación
+            popUpTo(0) { inclusive = true }
             launchSingleTop = true
         }
     }
@@ -57,7 +59,8 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = "splash"
+        // ✅ CAMBIO IMPORTANTE - Inicia según estado de autenticación
+        startDestination = if (isAuthenticated) "inicio" else "splash"
     ) {
         // Splash Screen
         composable("splash") {
@@ -78,7 +81,7 @@ fun AppNavigation() {
                 bottomBar = {
                     BottomNavBar(
                         navController = navController,
-                        onLogout = handleLogout // ← NUEVO: pasa la función de logout
+                        onLogout = handleLogout
                     )
                 }
             ) { paddingValues ->
@@ -99,7 +102,7 @@ fun AppNavigation() {
 
             FormularioVacaScreen(
                 navController = navController,
-                vacaParaEditar = vaca  // null = crear, vaca = editar
+                vacaParaEditar = vaca
             )
         }
 
