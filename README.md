@@ -106,6 +106,8 @@ A continuación se adjuntan las evidencias gráficas del proceso de firma digita
 
 
 **2. Archivos Generados (.apk y .jks):**
+
+
 <img width="278" height="171" alt="image" src="https://github.com/user-attachments/assets/c3310ff5-5b4f-4e8a-b81c-977423e46db5" />
 
 
@@ -115,6 +117,8 @@ A continuación se adjuntan las evidencias gráficas del proceso de firma digita
 
 > [!NOTE]
 > **Sobre el archivo APK:** Pese a que el nombre del archivo generado se visualice como `app-release`, este corresponde efectivamente al **APK final**. Al transferirlo a tu dispositivo o subirlo a la nube (Drive), el sistema lo reconocerá correctamente como un archivo `.apk` listo para instalar.
+
+
 
 Ejemplo de como se observa en drive:
 
