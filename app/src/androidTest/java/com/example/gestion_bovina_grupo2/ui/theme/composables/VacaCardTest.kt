@@ -3,7 +3,6 @@ package com.example.gestion_bovina_grupo2.ui.theme.composables
 import org.junit.Assert.*
 import com.example.gestion_bovina_grupo2.ui.theme.composables.VacaCard
 import com.example.gestion_bovina_grupo2.data.model.VacaApi
-// Imports de testing
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import org.junit.Rule
@@ -14,15 +13,15 @@ class VacaCardTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    // Datos de prueba comunes
+    // Datos de prueba
     private val vacaSana = VacaApi(
         id = "1",
         diio = 100,
-        dateBirthday = "2023-05-20T00:00:00.000Z", // Formato ISO que espera tu función
+        dateBirthday = "2023-05-20T00:00:00.000Z",
         genre = "M",
         race = "Holstein",
         location = "Campo Norte",
-        sick = null, // Sin enfermedad
+        sick = null, // No tiene enfermedad
         cowState = true // Activa
     )
 
@@ -39,25 +38,25 @@ class VacaCardTest {
 
     @Test
     fun muestra_informacion_basica_y_formatea_fecha() {
-        // 1. Cargamos la vaca sana
+        //Cargamos la vaca sana
         composeTestRule.setContent {
             VacaCard(vaca = vacaSana)
         }
 
-        // 2. Verificamos DIIO
+        //Verificamos DIIO
         composeTestRule.onNodeWithText("DIIO: 100").assertIsDisplayed()
 
-        // 3. Verificamos Raza
+        //Verificamos Raza
         composeTestRule.onNodeWithText("Holstein").assertIsDisplayed()
 
-        // 4. Verificamos Ubicación
+        //Verificamos Ubicación
         composeTestRule.onNodeWithText("Campo Norte").assertIsDisplayed()
 
-        // 5. ¡IMPORTANTE! Verificamos que tu función privada formatearFecha funcionó
-        // Tu función convierte "2023-05-20..." a "20/05/2023"
+        //Verificamos que la funcion formatearFecha funcionó
+        //La funcion convierte "2023-05-20..." a "20/05/2023"
         composeTestRule.onNodeWithText("20/05/2023").assertIsDisplayed()
 
-        // 6. Verificamos estado (Badge verde)
+        //Verificamos estado (Badge verde)
         composeTestRule.onNodeWithText("✓ Activo").assertIsDisplayed()
     }
 
@@ -117,30 +116,26 @@ class VacaCardTest {
             )
         }
 
-        // 1. Click en el botón eliminar de la tarjeta
+        //Click en el botón eliminar de la tarjeta
         // Usamos onLast() por seguridad, aunque al principio solo hay uno.
         composeTestRule.onNodeWithText("Eliminar").performClick()
 
-        // 2. Verificamos que APARECIÓ el diálogo
+        // Verificamos que APARECIÓ la noti
         composeTestRule.onNodeWithText("¿Eliminar vaca?").assertIsDisplayed()
 
-        // --- AQUÍ ESTABA EL ERROR ---
-        // Como el DIIO está en la tarjeta Y en el diálogo, usamos onAllNodes + onLast
-        // onLast() selecciona el elemento que está más "arriba" en la jerarquía visual (el diálogo)
+        // onLast() selecciona el elemento que está más "arriba" en la jerarquía visual (la noti)
         composeTestRule
             .onAllNodesWithText("DIIO: 100")
             .onLast()
             .assertIsDisplayed()
 
-        // 3. Hacemos click en "Eliminar" DENTRO del diálogo
-        // También hay dos botones "Eliminar" (fondo y diálogo), así que usamos onLast()
-        // para asegurarnos de clickear el del diálogo.
+        //Hacemos click en "Eliminar" DENTRO de la noti
         composeTestRule
             .onAllNodesWithText("Eliminar")
             .onLast()
             .performClick()
 
-        // 4. Verificamos el callback
+        //Verificamos el callback
         assert(fueEliminada)
     }
 }

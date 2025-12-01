@@ -90,8 +90,6 @@ dependencies {
     implementation("androidx.camera:camera-extensions:${camerax_version}")
     implementation("io.coil-kt:coil-compose:2.7.0")
 
-
-
     //Compose UI test
     androidTestImplementation("androidx.compose.ui:ui-test-junit4-android:1.7.5")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.5")
@@ -115,12 +113,7 @@ dependencies {
     // Debe coincidir con la versión de arriba (1.8.0)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
 
-// ==========================================
-    // UI TESTING (Carpeta androidTest - JUnit 4)
-    // ==========================================
-
-    // ---> AQUÍ ESTÁ LA SOLUCIÓN DEL ERROR <---
-    // Forzamos versiones específicas compatibles con Compose UI Test
+    // Forzamos versiones específicas compatibles con Compose UI Test (si no, no funciona)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
@@ -143,8 +136,7 @@ tasks.withType<Test>().configureEach {
 
 configurations.all {
     resolutionStrategy {
-        // Forzamos a Gradle a usar estas versiones específicas,
-        // ignorando si otras librerías piden versiones más nuevas.
+        // Forzamos a Gradle a usar estas versiones específicas,ignorando si otras librerías piden versiones más nuevas.
         force("androidx.test.ext:junit:1.1.5")
         force("androidx.test.espresso:espresso-core:3.5.1")
     }

@@ -66,9 +66,7 @@ class VacaApiViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // ===========================================================
     // VALIDACIONES DEL FORMULARIO
-    // ===========================================================
     @Test
     fun `validarFormulario falla cuando DIIO está vacío`() {
         viewModel.onDiioChange("")
@@ -107,9 +105,7 @@ class VacaApiViewModelTest {
         assertEquals("Holstein", viewModel.raza.value)
     }
 
-    // ===========================================================
     // OBTENER VACAS ACTIVAS
-    // ===========================================================
     @Test
     fun `obtenerVacasActivas carga las vacas correctamente`() = runTest {
         val listaVacas = listOf(vacaApiMock)
@@ -134,9 +130,7 @@ class VacaApiViewModelTest {
         assertEquals("Error al cargar las vacas", viewModel.error.value)
     }
 
-    // ===========================================================
     // CREAR VACA
-    // ===========================================================
     @Test
     fun `crearVaca funciona correctamente cuando repo devuelve respuesta`() = runTest {
         val request = VacaRequest(123, "2024-01-01", "m", "Holstein", "Corral 1", null)
@@ -168,9 +162,7 @@ class VacaApiViewModelTest {
         assertEquals("Error al crear la vaca", viewModel.createError.value)
     }
 
-    // ===========================================================
     // EDITAR VACA
-    // ===========================================================
     @Test
     fun `editarVaca funciona correctamente cuando repo devuelve respuesta`() = runTest {
         val request = VacaRequest(123, "2024-01-01", "m", "Holstein", "Corral 1", null)
@@ -199,9 +191,8 @@ class VacaApiViewModelTest {
         assertEquals("Error al editar la vaca", viewModel.updateError.value)
     }
 
-    // ===========================================================
+
     // ELIMINAR VACA
-    // ===========================================================
     @Test
     fun `eliminarVaca funciona correctamente cuando repo devuelve null (caso éxito)`() = runTest {
         // Según tu lógica: if(response == null) -> Éxito
@@ -228,11 +219,8 @@ class VacaApiViewModelTest {
         assertEquals("Error al eliminar la vaca", viewModel.deleteError.value)
     }
 
-    // ===========================================================
-    // NUEVOS TESTS AGREGADOS
-    // ===========================================================
 
-    // 1. TESTEAR EXCEPCIONES (CATCH BLOCK)
+    //TESTEAR EXCEPCIONES (CATCH BLOCK)
     @Test
     fun `obtenerVacasActivas maneja excepciones correctamente`() = runTest {
         // Simulamos que el repositorio lanza una excepción (ej. sin internet)
@@ -245,14 +233,13 @@ class VacaApiViewModelTest {
         assertFalse(viewModel.isLoading.value)
 
         // Verificamos que el mensaje de error en el ViewModel sea el esperado
-        // Tu ViewModel concatena "Error: " + e.message
         assertEquals("Error: Error de red fatal", viewModel.error.value)
     }
 
-    // 2. TESTEAR OBTENER VACAS DESACTIVADAS
+    //TESTEAR OBTENER VACAS DESACTIVADAS
     @Test
     fun `obtenerVacasDesactivadas carga correctamente la lista`() = runTest {
-        // Reutilizamos el mock que ya tienes definido arriba
+        // Reutilizamos el mock que que ya teníamos def.
         val listaVacas = listOf(vacaApiMock)
 
         // Mockeamos la llamada específica a getVacasDesactivadas
@@ -276,20 +263,19 @@ class VacaApiViewModelTest {
         assertEquals("Error al cargar las vacas desactivadas", viewModel.error.value)
     }
 
-    // 3. TESTEAR RESETEO DE ESTADOS (LIMPIAR FORMULARIO)
+    //TESTEAR RESETEO DE ESTADOS (LIMPIAR FORMULARIO)
     @Test
     fun `limpiarFormulario resetea todos los campos y errores`() {
-        // 1. "Ensuciamos" el estado poniendo valores
+        // "Ensuciamos" el estado poniendo valores
         viewModel.onDiioChange("99999")
         viewModel.onRazaChange("Angus")
         viewModel.onUbicacionChange("Zona Norte")
-        // Forzamos un error simulado (aunque normalmente lo pone el validador)
-        // Como los _states son privados, probamos limpiando tras setear valores válidos.
+        // Forzamos un error simulado pero como los _states son privados, probamos limpiando tras setear valores válidos.
 
-        // 2. Ejecutamos la limpieza
+        //Ejecutamos la limpieza
         viewModel.limpiarFormulario()
 
-        // 3. Verificamos que todo esté vacío o nulo
+        /*Verificamos que todo esté vacío o nulo*/
         assertEquals("", viewModel.diio.value)
         assertEquals("", viewModel.raza.value)
         assertEquals("", viewModel.ubicacion.value)
@@ -300,10 +286,10 @@ class VacaApiViewModelTest {
         assertNull(viewModel.razaError.value)
     }
 
-    // Test extra: Reseteo de estados de éxito/error tras eliminar
+    //Reseteo de estados de éxito/error tras eliminar
     @Test
     fun `resetDeleteStates limpia los estados de eliminación`() = runTest {
-        // 1. Simulamos un estado post-eliminación
+        //simulamos un estado post-eliminación
         coEvery { anyConstructed<VacaRepository>().eliminarVaca("1") } returns null // Exito
         coEvery { anyConstructed<VacaRepository>().getVacas() } returns emptyList()
 
@@ -313,10 +299,10 @@ class VacaApiViewModelTest {
         // Confirmamos que está en true
         assertTrue(viewModel.deleteSucces.value)
 
-        // 2. Llamamos al reset
+        //Llamamos al reset
         viewModel.resetDeleteStates()
 
-        // 3. Verificamos que volvió a false/null
+        //Verificamos que volvió a false/null
         assertFalse(viewModel.deleteSucces.value)
         assertNull(viewModel.deleteError.value)
     }

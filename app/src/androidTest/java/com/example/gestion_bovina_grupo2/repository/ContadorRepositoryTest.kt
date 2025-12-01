@@ -16,10 +16,9 @@ class ContadorRepositoryTest {
 
     @Before
     fun setup() {
-        // --- PASO CRUCIAL: LIMPIEZA ---
-        // Antes de cada test, borramos el archivo físico de DataStore.
-        // Esto asegura que cada test empiece "como si instalaras la app de cero".
-        // El nombre "vacas_counters" viene de tu constante DS_NAME.
+        /*Antes de cada test, borramos el archivo físico de DataStore.
+        Esto asegura que cada test empiece "como si instalaras la app de cero".
+        El nombre "vacas_counters" viene de la constante DS_NAME.*/
         val dataStoreFile = File(context.filesDir, "datastore/vacas_counters.preferences_pb")
         if (dataStoreFile.exists()) {
             dataStoreFile.delete()
@@ -30,10 +29,10 @@ class ContadorRepositoryTest {
 
     @Test
     fun getCountersOnce_retorna_valores_por_defecto_al_inicio() = runTest {
-        // 1. Leemos sin haber guardado nada
+        //Leemos sin haber guardado nada
         val contadores = repository.getCountersOnce()
 
-        // 2. Verificamos que use tus constantes DEFAULT_TOTAL (23) y DEFAULT_HOY (0)
+        //Verificamos que use tus constantes DEFAULT_TOTAL (23) y DEFAULT_HOY (0)
         assertEquals(23, contadores.total)
         assertEquals(0, contadores.hoy)
     }
@@ -42,28 +41,28 @@ class ContadorRepositoryTest {
     fun incrementOnVacaGuardada_suma_uno_a_ambos_valores() = runTest {
         // Estado inicial implícito: 23 y 0
 
-        // 1. Ejecutamos la acción de incrementar
+        //Ejecutamos la acción de incrementar
         val resultado = repository.incrementOnVacaGuardada()
 
-        // 2. Verificamos el retorno inmediato
+        //Verificamos el retorno inmediato
         assertEquals(24, resultado.total) // 23 + 1
         assertEquals(1, resultado.hoy)    // 0 + 1
 
-        // 3. Verificamos persistencia (leyendo de nuevo)
+        //Verificamos persistencia (leyendo de nuevo)
         val lecturaPosterior = repository.getCountersOnce()
         assertEquals(24, lecturaPosterior.total)
     }
 
     @Test
     fun setCounters_sobrescribe_y_guarda_los_datos() = runTest {
-        // 1. Guardamos valores arbitrarios
+        //Guardamos valores arbitrarios
         repository.setCounters(total = 100, hoy = 50)
 
-        // 2. Simulamos "reiniciar el repo" (creamos nueva instancia)
+        //Simulamos "reiniciar el repo" (creamos nueva instancia)
         val nuevoRepo = ContadorRepository(context)
         val lectura = nuevoRepo.getCountersOnce()
 
-        // 3. Verificamos que los datos siguen ahí
+        //Verificamos que los datos siguen ahí
         assertEquals(100, lectura.total)
         assertEquals(50, lectura.hoy)
     }

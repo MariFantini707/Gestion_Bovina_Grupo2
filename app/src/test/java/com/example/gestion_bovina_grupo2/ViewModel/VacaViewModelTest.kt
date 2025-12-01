@@ -1,7 +1,7 @@
 package com.example.gestion_bovina_grupo2.ViewModel
 
 import com.example.gestion_bovina_grupo2.repository.ContadorRepository
-import com.example.gestion_bovina_grupo2.repository.Contadores // Importamos tu data class
+import com.example.gestion_bovina_grupo2.repository.Contadores
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +20,7 @@ class VacaViewModelTest {
     @MockK
     lateinit var repo: ContadorRepository
 
-    // No declaramos el viewModel con @Inject o lateinit aquí arriba
-    // porque necesitamos iniciarlo DENTRO de cada test para controlar el bloque init{}.
+    // No declaramos el viewModel con @Inject o lateinit aquí arriba porque necesitamos iniciarlo DENTRO de cada test para controlar el bloque init{}.
 
     @BeforeEach
     fun setup() {
@@ -37,27 +36,25 @@ class VacaViewModelTest {
 
     @Test
     fun `init carga correctamente los contadores desde el repositorio`() = runTest {
-        // 1. PREPARACIÓN (ARRANGE)
         // Definimos los datos que queremos que devuelva el "repo falso"
         val datosPrueba = Contadores(total = 50, hoy = 15)
 
-        // IMPORTANTE: Definimos el comportamiento ANTES de crear el ViewModel
+        // Definimos el comportamiento ANTES de crear el ViewModel
         coEvery { repo.getCountersOnce() } returns datosPrueba
 
-        // 2. EJECUCIÓN (ACT)
         // Al crear la instancia, se ejecuta automáticamente el bloque init {}
         val viewModel = VacaViewModel(repo)
 
         // Dejamos que la corrutina del init termine su trabajo
         advanceUntilIdle()
 
-        // 3. VERIFICACIÓN (ASSERT)
+        // VERIFICACIÓN (ASSERT)
         // Verificamos que el ViewModel llamó al repositorio
         coVerify(exactly = 1) { repo.getCountersOnce() }
 
         // Verificamos que el valor público 'registradasHoy' sea 15
         assertEquals(15, viewModel.registradasHoy.value)
-        assertEquals(50, viewModel.totalVacas.value)        // NOTA: No podemos verificar 'total' porque _totalVacas es privado en tu ViewModel.
+        assertEquals(50, viewModel.totalVacas.value)
     }
 
     @Test

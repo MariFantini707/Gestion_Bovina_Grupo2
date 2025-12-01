@@ -7,10 +7,10 @@ class VacaApiTest {
 
     @Test
     fun `getGeneroLegible retorna Hembra cuando el genero es F mayuscula`() {
-        // 1. Crear vaca con género F
+        // Crear vaca con género F
         val vaca = crearVacaDummy(genero = "F")
 
-        // 2. Verificar
+        // Verificar
         assertEquals("Hembra", vaca.getGeneroLegible())
     }
 
@@ -28,14 +28,13 @@ class VacaApiTest {
         assertEquals("Desconocido", crearVacaDummy("").getGeneroLegible())  // Vacío
     }
 
-    // --- FUNCIÓN DE AYUDA (Helper) ---
-    // Nos ahorra escribir todos los campos obligatorios en cada test
+    //Escribimos una función de ayuda porque ahorra escribir todos los campos obligatorios en cada test
     private fun crearVacaDummy(genero: String): VacaApi {
         return VacaApi(
             id = "1",
             diio = 123,
             dateBirthday = "2024-01-01",
-            genre = genero, // <--- Esto es lo único que nos importa probar aquí
+            genre = genero,
             race = "Test",
             location = "Test",
             sick = null,

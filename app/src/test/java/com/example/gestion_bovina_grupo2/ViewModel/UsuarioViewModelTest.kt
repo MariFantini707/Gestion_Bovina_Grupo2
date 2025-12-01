@@ -43,18 +43,15 @@ class UsuarioViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // ===========================================================
     // ACTUALIZACIÓN DE CAMPOS
-    // ===========================================================
-
     @Test
     fun `onEmailChange actualiza el email y limpia errores`() {
         // Simulamos escribir en el campo email
         viewModel.onEmailChange("test@correo.com")
 
-        // Verificamos que el estado cambió
+        // Verificamos que el estado cambio
         assertEquals("test@correo.com", viewModel.estado.value.email)
-        // Verificamos que el error de email se limpió (es null)
+        // Verificamos que el error de email se limpio (es null)
         assertNull(viewModel.estado.value.errores.email)
     }
 
@@ -64,24 +61,21 @@ class UsuarioViewModelTest {
         assertEquals("123456", viewModel.estado.value.password)
     }
 
-    // ===========================================================
     // VALIDACIONES LOCALES
-    // ===========================================================
-
     @Test
     fun `validarYLogin muestra errores si los campos están vacios`() = runTest {
         // Como el Usuario por defecto tiene strings vacíos (""), no necesitamos setear nada
 
         var successLlamado = false
 
-        // Ejecutamos validación
+        // Ejecutamos validacion
         viewModel.validarYLogin(onSuccess = { successLlamado = true })
         advanceUntilIdle()
 
         // Verificamos que NO tuvo éxito
         assertFalse(successLlamado)
 
-        // Verificamos los mensajes de error exactos definidos en tu ViewModel
+        // Verificamos los mensajes de error exactos que ya habiamos deifinido en el ViewModel
         assertEquals("El correo es obligatorio", viewModel.estado.value.errores.email)
         assertEquals("La contraseña es obligatoria", viewModel.estado.value.errores.password)
 
@@ -89,32 +83,29 @@ class UsuarioViewModelTest {
         coVerify(exactly = 0) { anyConstructed<UsuarioRepository>().login(any(), any()) }
     }
 
-    // ===========================================================
     // LOGIN CON API (CASOS DE ÉXITO Y ERROR)
-    // ===========================================================
-
     @Test
     fun `validarYLogin funciona correctamente (Login Exitoso)`() = runTest {
-        // 1. Llenamos el formulario con datos válidos
+        //Llenamos el formulario con datos válidos
         viewModel.onEmailChange("usuario@test.com")
         viewModel.onPasswordChange("123456")
 
-        // 2. Mock: El repositorio devuelve un token válido
+        //Mock: El repositorio devuelve un token válido
         coEvery {
             anyConstructed<UsuarioRepository>().login("usuario@test.com", "123456")
         } returns "token_valido_abc"
 
         var successLlamado = false
 
-        // 3. Ejecutamos
+        //Ejecutamos
         viewModel.validarYLogin(onSuccess = { successLlamado = true })
         advanceUntilIdle()
 
-        // 4. Verificaciones
+        //Verificaciones
         assertTrue(successLlamado, "El callback onSuccess debería haberse ejecutado")
         assertFalse(viewModel.isLoading.value) // La carga debe haber terminado
 
-        // Al tener éxito, tu ViewModel llama a limpiarFormulario(),
+        // Al tener éxito, el ViewModel llama a limpiarFormulario(),
         // así que el email debería volver a estar vacío.
         assertEquals("", viewModel.estado.value.email)
         assertEquals("", viewModel.estado.value.password)
@@ -157,10 +148,7 @@ class UsuarioViewModelTest {
         assertEquals("Error de conexión con el servidor", viewModel.estado.value.errores.loginGeneral)
     }
 
-    // ===========================================================
     // LOGOUT Y LIMPIEZA
-    // ===========================================================
-
     @Test
     fun `logout cierra sesion y limpia formulario`() {
         // Llenamos el formulario para ver si se limpia
@@ -174,8 +162,7 @@ class UsuarioViewModelTest {
         // Verifica que el formulario volvió a estar vacío
         assertEquals("", viewModel.estado.value.email)
 
-        // Verificación extra: como Usuario() tiene valores por defecto,
-        // el rut también debería ser "" aunque no lo hayamos tocado.
+        // como Usuario() tiene valores por defecto, el rut también debería ser "" aunque no lo hayamos tocado.
         assertEquals("", viewModel.estado.value.rut)
     }
 }
