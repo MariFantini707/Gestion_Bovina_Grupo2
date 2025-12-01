@@ -77,6 +77,68 @@ Para el correcto funcionamiento del sistema, es necesario levantar primero el se
     * Seleccionar o crear un emulador con **API 34** o **API 35**.
     * **Advertencia:** No utilizar la API 36, ya que puede generar conflictos con las pruebas.
 9.  Una vez que se visualice la pantalla del emulador, presionar el botón de encendido (**Play**).
-10. Por último, ejecutar la app presionando el botón **"Run 'app'"** (triángulo verde) asegurándose de estar en `MainActivity`.
-   
-  
+10. Ejecutar la app presionando el botón **"Run 'app'"** (triángulo verde) asegurándose de estar en `MainActivity`.
+11. Por ultimo, para poder acceder a todas las funciones de la app escribe en el inicio de sesión las siguientes credenciales: **Usuario: juanAdmin@colum.cl** , **Contraseña: 123456**.
+
+
+### 6. Evidencia de APK firmado y .jks
+
+A continuación se adjuntan las evidencias gráficas del proceso de firma digital y la generación de los archivos entregables en modo **Release**.
+
+**1. Proceso de Generación en Android Studio:**
+<img width="543" height="492" alt="image" src="https://github.com/user-attachments/assets/ba6697b3-6690-4113-b0b0-2900daac215e" />
+
+<img width="622" height="490" alt="image" src="https://github.com/user-attachments/assets/15dbe148-7322-4c48-9c6e-3753aaba83b0" />
+
+<img width="620" height="498" alt="image" src="https://github.com/user-attachments/assets/e676ca1d-a59a-45c9-b94d-77a18ffa3b0f" />
+
+<img width="624" height="491" alt="image" src="https://github.com/user-attachments/assets/1b13c7f3-23dc-4fe7-88bb-d0300a77c50a" />
+
+
+**2. Archivos Generados (.apk y .jks):**
+<img width="278" height="171" alt="image" src="https://github.com/user-attachments/assets/c3310ff5-5b4f-4e8a-b81c-977423e46db5" />
+
+<img width="656" height="114" alt="image" src="https://github.com/user-attachments/assets/7a09e162-a474-417d-a4bb-39131c9fd197" />
+> [!NOTE]
+> **Sobre el archivo APK:** Pese a que el nombre del archivo generado se visualice como `app-release`, este corresponde efectivamente al **APK final**. Al transferirlo a tu dispositivo o subirlo a la nube (Drive), el sistema lo reconocerá correctamente como un archivo `.apk` listo para instalar.
+
+Ejemplo de como se observa en drive:
+<img width="350" height="112" alt="image" src="https://github.com/user-attachments/assets/6cf53250-cd08-4f7e-b1bf-d53f181b1eef" />
+
+
+### 📸 Proceso de Instalación en Dispositivo
+
+A continuación se muestra cómo se visualiza el proceso de instalación manual del archivo **APK** en un dispositivo Android físico.
+
+| 1. Confirmación de Instalación | 2. Proceso de Instalación | 3. App Instalada y Lista |
+<img width="399" height="887" alt="image" src="https://github.com/user-attachments/assets/e64fc02f-260c-4784-a8a1-7c5e205edcc0" />
+
+<img width="399" height="890" alt="image" src="https://github.com/user-attachments/assets/02f4cd0e-fbba-4f78-ba4c-6700f04d500e" />
+
+<img width="401" height="891" alt="image" src="https://github.com/user-attachments/assets/0fa281cd-d134-4b73-91ce-3bb43890bed0" />
+
+<img width="401" height="888" alt="image" src="https://github.com/user-attachments/assets/16c33804-c40e-433a-8dae-4b94270c2647" />
+
+<img width="400" height="892" alt="image" src="https://github.com/user-attachments/assets/a29bdf41-b31f-4916-8d30-40a39992be9a" />
+
+> **Nota sobre seguridad:** Al ser una aplicación instalada manualmente (Sideloading) y no descargada desde Google Play Store, es posible que el dispositivo solicite permisos para **"Instalar aplicaciones de fuentes desconocidas"** o muestre una advertencia de **Google Play Protect**. Esto es un comportamiento estándar de seguridad en Android.
+
+
+### 🛠️ Tecnologías y Librerías
+
+Este proyecto fue desarrollado utilizando un stack tecnológico moderno nativo para Android, integrando herramientas de vanguardia:
+
+* **Lenguaje:** [Kotlin](https://kotlinlang.org/) (100%)
+* **Arquitectura:** MVVM (Model-View-ViewModel)
+* **Interfaz de Usuario:** [Jetpack Compose](https://developer.android.com/jetpack/compose) (Material Design 3)
+* **Navegación:** Navigation Compose
+* **Red y Conectividad:** Retrofit 2 + Gson Converter
+* **Asincronismo:** Kotlin Coroutines & StateFlow
+* **Persistencia Local:** Jetpack DataStore (Preferences)
+* **Carga de Imágenes:** Coil
+* **Integración de Hardware y Sensores:**
+    * **CameraX / Intents:** Captura de evidencia fotográfica nativa.
+    * **Vibrator API (Haptics):** Implementación de feedback háptico (vibración) para alertar al usuario sobre errores de validación en formularios.
+* **Calidad y Testing:**
+    * **Unit Testing:** JUnit 5, MockK, Coroutines Test.
+    * **UI Testing:** Espresso, Compose UI Test (JUnit 4).
